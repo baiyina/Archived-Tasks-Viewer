@@ -5,147 +5,469 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Archived Tasks Viewer</title>
     <style>
+      :root {
+        --bg: #0f1115;
+        --card: #161a20;
+        --muted: #9ba3b4;
+        --border: #252a33;
+        --accent: #6ac8ff;
+        --accent-bg: rgba(106, 200, 255, 0.14);
+        --accent-border: rgba(106, 200, 255, 0.28);
+        --accent-text: #c7eeff;
+        --grad1: rgba(106, 200, 255, 0.06);
+        --grad2: rgba(255, 146, 255, 0.06);
+        --surface-1: rgba(255, 255, 255, 0.03);
+        --surface-2: rgba(255, 255, 255, 0.05);
+        --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        --radius: 12px;
+        --text: #e6edf7;
+        --focus-outline: rgba(106, 200, 255, 0.35);
+        --focus-shadow: 0 0 0 3px rgba(106, 200, 255, 0.12);
+        --backdrop: rgba(0, 0, 0, 0.65);
+      }
+      * {
+        box-sizing: border-box;
+      }
       body {
         font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
         margin: 0;
-        padding: 16px;
-        background: var(--bg, #121212);
-        color: var(--text-color, #e0e0e0);
+        padding: 18px;
+        background: radial-gradient(circle at 20% 20%, var(--grad1), transparent 25%),
+          radial-gradient(circle at 80% 0%, var(--grad2), transparent 25%), var(--bg);
+        color: var(--text, #e6edf7);
       }
-      h1 {
-        margin: 0 0 8px;
-        font-size: 20px;
+      .topbar {
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 21px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        flex: 0 0 auto;
+      }
+      .header-actions .muted {
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        color: var(--accent-text);
+        font-size: 12px;
       }
       .toolbar {
         display: flex;
-        align-items: center;
+        flex-wrap: wrap;
+        align-items: flex-end;
         gap: 12px;
         margin-bottom: 16px;
-        flex-wrap: wrap;
       }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        min-width: 200px;
+        flex: 1;
+      }
+      .field-inline {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      input,
       select,
       button {
-        background: var(--card-bg, #1e1e1e);
+        background: var(--card);
         color: inherit;
-        border: 1px solid var(--divider-color, #2c2c2c);
-        padding: 6px 10px;
-        border-radius: 6px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0 14px;
+        font-size: 14px;
+        height: 44px;
+        line-height: 1.1;
+      }
+      select {
+        appearance: none;
+        background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+          linear-gradient(135deg, var(--muted) 50%, transparent 50%),
+          linear-gradient(to right, transparent, transparent);
+        background-position: calc(100% - 18px) calc(50% - 3px),
+          calc(100% - 12px) calc(50% - 3px),
+          calc(100% - 44px) 0.35em;
+        background-size: 6px 6px, 6px 6px, 1px 1.2em;
+        background-repeat: no-repeat;
+        padding-right: 42px;
+      }
+      input:focus,
+      select:focus {
+        outline: 1px solid var(--focus-outline);
+        box-shadow: var(--focus-shadow);
       }
       button {
         cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease;
+      }
+      button.primary {
+        background: linear-gradient(180deg, var(--accent-bg), var(--surface-1));
+        border: 1px solid var(--accent-border);
+        color: var(--accent-text);
+        font-weight: 800;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+      }
+      button.primary:hover {
+        background: linear-gradient(180deg, var(--accent-bg), var(--surface-2));
+      }
+      button.ghost {
+        background: transparent;
+        border: 1px solid var(--border);
+      }
+      .btn-sm {
+        height: 34px;
+        border-radius: 999px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+      button.theme-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--accent-bg), var(--surface-1));
+        border: 1px solid var(--accent-border);
+        color: var(--accent-text);
+        padding: 0 12px;
+        height: 34px;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      }
+      button.theme-btn:hover {
+        border-color: var(--accent-border);
+        background: linear-gradient(180deg, var(--accent-bg), var(--surface-2));
+      }
+      button.theme-btn:active {
+        transform: translateY(1px);
+      }
+      button.theme-btn svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 auto;
+      }
+      .theme-label {
+        font-weight: 800;
+        font-size: 13px;
+        letter-spacing: 0.2px;
       }
       .status {
-        margin: 8px 0 16px;
-        color: var(--text-color-muted, #9e9e9e);
+        margin: 6px 0 16px;
+        color: var(--muted);
       }
       .group {
-        margin-bottom: 18px;
+        margin-bottom: 22px;
       }
       .group-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 10px;
-        border-bottom: 1px solid var(--divider-color, #2c2c2c);
-        padding-bottom: 4px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 6px;
       }
       .group-title {
         font-weight: 700;
+        letter-spacing: 0.2px;
       }
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 12px;
+        gap: 14px;
       }
       .card {
-        background: var(--card-bg, #1e1e1e);
-        border-radius: var(--card-border-radius, 8px);
-        box-shadow: var(--whiteframe-shadow-4dp, 0 2px 4px rgba(0, 0, 0, 0.4));
-        padding: 12px;
-        border: 1px solid var(--divider-color, #2c2c2c);
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        padding: 14px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
       }
       .title-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 8px;
+        align-items: flex-start;
+        gap: 12px;
       }
       .task-title {
-        font-weight: 700;
+        font-weight: 800;
+        font-size: 16px;
+        line-height: 1.4;
       }
       .pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         font-size: 12px;
-        padding: 3px 6px;
-        border-radius: 6px;
-        background: var(--bg-darker, rgba(255, 255, 255, 0.05));
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+      }
+      .pill.accent {
+        background: var(--accent-bg);
+        border-color: var(--accent-border);
+        color: var(--accent-text);
       }
       .meta {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        color: var(--text-color-muted, #9e9e9e);
+        color: var(--muted);
         font-size: 13px;
       }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        color: var(--text);
+        font-size: 12px;
+        border: 1px solid var(--border);
+      }
       .section {
-        border-top: 1px solid var(--divider-color, #2c2c2c);
-        padding-top: 6px;
+        border-top: 1px solid var(--border);
+        padding-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .section-title {
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--muted);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .tree {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .tree-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+      }
+      .tree-row .muted {
+        justify-self: end;
+      }
+      .tree-indent-0 {
+        margin-left: 0;
+      }
+      .tree-indent-1 {
+        margin-left: 12px;
+      }
+      .tree-indent-2 {
+        margin-left: 24px;
+      }
+      .tree-indent-3 {
+        margin-left: 36px;
+      }
+      .tree-indent-4 {
+        margin-left: 48px;
       }
       .subtasks,
       .attachments {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 6px;
       }
       .subtask,
       .attachment {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 8px;
-        padding: 6px 8px;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.03);
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: var(--surface-1);
+        border: 1px solid var(--border);
       }
       .attachment a {
         color: inherit;
         text-decoration: none;
       }
-      .small {
-        font-size: 12px;
-        color: var(--text-color-muted, #9e9e9e);
-      }
       .notes {
         margin: 0;
         white-space: pre-wrap;
-        color: var(--text-color, #e0e0e0);
+        color: var(--text, #e6edf7);
+        line-height: 1.5;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .card-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tight {
+        gap: 6px;
+      }
+      .truncate {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      /* Modal */
+      #modal-root {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: var(--backdrop);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 32px 18px;
+        pointer-events: auto;
+        z-index: 10;
+      }
+      .modal {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        width: min(900px, 100%);
+        padding: 18px;
+        max-height: calc(100vh - 64px);
+        overflow: auto;
+        color: var(--text);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .close-btn {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: inherit;
+        border-radius: 8px;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+      .kv {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 8px;
+        margin: 8px 0 12px;
+      }
+      .kv-item {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .kv-label {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .kv-value {
+        font-weight: 600;
+      }
+      @media (max-width: 540px) {
+        .title-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .card-footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Archived Tasks Viewer</h1>
+    <div class="topbar">
+      <h1>
+        Archived Tasks Viewer
+        <span class="badge">Read-only</span>
+      </h1>
+      <div class="header-actions">
+        <button id="reload-btn" class="primary btn-sm" type="button">Reload</button>
+        <span id="count" class="muted"></span>
+        <button id="theme-toggle" class="theme-btn" type="button" aria-label="Toggle theme"></button>
+      </div>
+    </div>
     <div class="toolbar">
-      <label>
-        Group by:
+      <div class="field">
+        <span>Group by</span>
         <select id="group-select">
           <option value="date">Completion date</option>
           <option value="tag">Tag</option>
           <option value="project">Project</option>
         </select>
-      </label>
-      <button id="reload-btn">Reload</button>
-      <span id="count" class="small"></span>
+      </div>
+      <div class="field">
+        <span>View mode</span>
+        <select id="view-mode">
+          <option value="parent">Parent tasks (tree)</option>
+          <option value="flat">All tasks (flat)</option>
+        </select>
+      </div>
+      <div class="field">
+        <span>Filter</span>
+        <input id="filter-input" type="search" placeholder="Title, notes, tag, project, subtask..." />
+      </div>
     </div>
-    <div id="status" class="status">Loading archived tasks…</div>
+    <div id="status" class="status">Loading archived tasks...</div>
     <div id="content"></div>
+    <div id="modal-root"></div>
 
     <script>
       const state = {
@@ -153,6 +475,10 @@
         tags: {},
         projects: {},
         group: 'date',
+        filter: '',
+        viewTask: null,
+        viewMode: 'parent',
+        theme: 'dark',
       };
 
       const waitForPluginApi = async () => {
@@ -167,6 +493,81 @@
       const elGroup = document.getElementById('group-select');
       const elCount = document.getElementById('count');
       const elReload = document.getElementById('reload-btn');
+      const elFilter = document.getElementById('filter-input');
+      const elModalRoot = document.getElementById('modal-root');
+      const elViewMode = document.getElementById('view-mode');
+      const elThemeToggle = document.getElementById('theme-toggle');
+
+      function prefersDark() {
+        return (
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        );
+      }
+
+      function getSavedTheme() {
+        try {
+          const t = localStorage.getItem('avp_theme');
+          return t === 'dark' || t === 'light' ? t : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function saveTheme(theme) {
+        try {
+          localStorage.setItem('avp_theme', theme);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      const applyTheme = (mode) => {
+        const theme = mode === 'light' ? 'light' : 'dark';
+        const root = document.documentElement.style;
+        if (theme === 'light') {
+          root.setProperty('--bg', '#f6f7fb');
+          root.setProperty('--card', '#ffffff');
+          root.setProperty('--muted', '#475569');
+          root.setProperty('--border', '#d6dde8');
+          root.setProperty('--accent', '#2563eb');
+          root.setProperty('--shadow', '0 12px 30px rgba(15, 23, 42, 0.12)');
+          root.setProperty('--text', '#0f172a');
+          root.setProperty('--surface-1', '#f3f6fd');
+          root.setProperty('--surface-2', '#edf2ff');
+          root.setProperty('--grad1', 'rgba(37, 99, 235, 0.10)');
+          root.setProperty('--grad2', 'rgba(14, 165, 233, 0.08)');
+          root.setProperty('--accent-bg', 'rgba(37, 99, 235, 0.10)');
+          root.setProperty('--accent-border', 'rgba(37, 99, 235, 0.24)');
+          root.setProperty('--accent-text', '#1d4ed8');
+          root.setProperty('--focus-outline', 'rgba(37, 99, 235, 0.35)');
+          root.setProperty('--focus-shadow', '0 0 0 3px rgba(37, 99, 235, 0.14)');
+          root.setProperty('--backdrop', 'rgba(15, 23, 42, 0.42)');
+        } else {
+          root.setProperty('--bg', '#0f1115');
+          root.setProperty('--card', '#161a20');
+          root.setProperty('--muted', '#9ba3b4');
+          root.setProperty('--border', '#252a33');
+          root.setProperty('--accent', '#6ac8ff');
+          root.setProperty('--shadow', '0 12px 40px rgba(0, 0, 0, 0.35)');
+          root.setProperty('--text', '#e6edf7');
+          root.setProperty('--surface-1', 'rgba(255, 255, 255, 0.03)');
+          root.setProperty('--surface-2', 'rgba(255, 255, 255, 0.05)');
+          root.setProperty('--grad1', 'rgba(106, 200, 255, 0.06)');
+          root.setProperty('--grad2', 'rgba(255, 146, 255, 0.06)');
+          root.setProperty('--accent-bg', 'rgba(106, 200, 255, 0.14)');
+          root.setProperty('--accent-border', 'rgba(106, 200, 255, 0.28)');
+          root.setProperty('--accent-text', '#c7eeff');
+          root.setProperty('--focus-outline', 'rgba(106, 200, 255, 0.35)');
+          root.setProperty('--focus-shadow', '0 0 0 3px rgba(106, 200, 255, 0.12)');
+          root.setProperty('--backdrop', 'rgba(0, 0, 0, 0.65)');
+        }
+        elThemeToggle.dataset.theme = theme;
+        elThemeToggle.innerHTML =
+          theme === 'dark'
+            ? `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z\"/></svg><span class=\"theme-label\">Dark</span>`
+            : `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"M4.93 4.93l1.41 1.41\"/><path d=\"M17.66 17.66l1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"M4.93 19.07l1.41-1.41\"/><path d=\"M17.66 6.34l1.41-1.41\"/></svg><span class=\"theme-label\">Light</span>`;
+      };
 
       const formatDate = (ts) => {
         if (!ts) return '-';
@@ -189,11 +590,72 @@
 
       const unassigned = 'Unassigned';
 
+      const formatTags = (task) => {
+        const ids = task.tagIds || [];
+        return ids.map((id) => state.tags[id] || unassigned).filter(Boolean);
+      };
+
+      const textIncludes = (text, term) => (text || '').toLowerCase().includes(term);
+
+      const matchTask = (t, q) => {
+        if (!q) return true;
+        const tagText = formatTags(t).join(' ');
+        const projectText = t.projectId ? state.projects[t.projectId] || '' : '';
+        return (
+          textIncludes(t.title, q) ||
+          textIncludes(t.notes, q) ||
+          textIncludes(tagText, q) ||
+          textIncludes(projectText, q)
+        );
+      };
+
+      const buildTree = (tasks) => {
+        const map = new Map();
+        tasks.forEach((t) => map.set(t.id, { ...t, children: [] }));
+        const roots = [];
+        map.forEach((t) => {
+          if (t.parentId && map.has(t.parentId)) {
+            map.get(t.parentId).children.push(t);
+          } else {
+            roots.push(t);
+          }
+        });
+        return roots;
+      };
+
+      const filterTree = (nodes, term) => {
+        const q = term?.toLowerCase?.() || '';
+        const walk = (node, depth = 0) => {
+          const kids = (node.children || []).map((c) => walk(c, depth + 1)).filter(Boolean);
+          const selfMatch = matchTask(node, q);
+          if (selfMatch || kids.length) {
+            return { ...node, children: kids };
+          }
+          return null;
+        };
+        return nodes.map((n) => walk(n)).filter(Boolean);
+      };
+
+      const flatten = (nodes) => {
+        const res = [];
+        const walk = (n) => {
+          res.push(n);
+          (n.children || []).forEach(walk);
+        };
+        nodes.forEach(walk);
+        return res;
+      };
+
+      const filterTasks = (tasks, term) => {
+        if (!term) return tasks;
+        const q = term.toLowerCase();
+        return tasks.filter((t) => matchTask(t, q));
+      };
+
+      const getDoneOn = (t) => (typeof t.doneOn === 'number' ? t.doneOn : t.created || Date.now());
+
       function groupTasks(tasks, mode) {
         const groups = new Map();
-        const getDoneOn = (t) =>
-          typeof t.doneOn === 'number' ? t.doneOn : t.created || Date.now();
-
         for (const task of tasks) {
           const key =
             mode === 'date'
@@ -228,15 +690,35 @@
       }
 
       function render() {
+        const tree = buildTree(state.tasks);
+        const filteredTree = filterTree(tree, state.filter);
+        const filteredFlat =
+          state.viewMode === 'flat'
+            ? filterTasks(flatten(tree), state.filter)
+            : flatten(filteredTree);
+
         if (!state.tasks.length) {
           elStatus.textContent = 'No archived tasks found.';
           elContent.innerHTML = '';
           elCount.textContent = '';
+          renderDetail();
           return;
         }
+        if (!filteredFlat.length) {
+          elStatus.textContent = 'No tasks match the current filter.';
+          elContent.innerHTML = '';
+          elCount.textContent = `${filteredFlat.length} of ${state.tasks.length} tasks`;
+          renderDetail();
+          return;
+        }
+
         elStatus.textContent = '';
-        const groups = groupTasks(state.tasks, state.group);
-        elCount.textContent = `${state.tasks.length} tasks`;
+        const listToGroup =
+          state.viewMode === 'parent'
+            ? filteredTree
+            : filterTasks(state.tasks, state.filter);
+        const groups = groupTasks(listToGroup, state.group);
+        elCount.textContent = `${filteredFlat.length} of ${state.tasks.length} tasks`;
 
         const frag = document.createDocumentFragment();
         groups.forEach((group) => {
@@ -249,7 +731,7 @@
           title.className = 'group-title';
           title.textContent = group.label;
           const count = document.createElement('span');
-          count.className = 'small';
+          count.className = 'muted';
           count.textContent = `${group.tasks.length} task(s)`;
           header.appendChild(title);
           header.appendChild(count);
@@ -257,7 +739,9 @@
 
           const grid = document.createElement('div');
           grid.className = 'grid';
-          group.tasks.forEach((task) => grid.appendChild(renderTask(task)));
+          group.tasks.forEach((task) =>
+            grid.appendChild(renderTask(task, state.viewMode === 'parent')),
+          );
           section.appendChild(grid);
 
           frag.appendChild(section);
@@ -265,10 +749,11 @@
 
         elContent.innerHTML = '';
         elContent.appendChild(frag);
+        renderDetail();
       }
 
-      function renderTask(task) {
-        const card = document.createElement('div');
+      function renderTask(task, isTree) {
+        const card = document.createElement('article');
         card.className = 'card';
 
         const titleRow = document.createElement('div');
@@ -277,8 +762,8 @@
         title.className = 'task-title';
         title.textContent = task.title || '(untitled)';
         const doneOn = document.createElement('span');
-        doneOn.className = 'pill';
-        doneOn.textContent = formatDate(task.doneOn);
+        doneOn.className = 'pill accent';
+        doneOn.textContent = `Done: ${formatDate(task.doneOn)}`;
         titleRow.appendChild(title);
         titleRow.appendChild(doneOn);
         card.appendChild(titleRow);
@@ -287,38 +772,69 @@
         meta.className = 'meta';
         meta.innerHTML = `
           <span>Project: ${task.projectId ? state.projects[task.projectId] || unassigned : unassigned}</span>
-          <span>Tags: ${formatTags(task)}</span>
           <span>Issue: ${task.issueId || '-'}</span>
           <span>Time: ${formatMs(task.timeSpent)}${task.timeEstimate ? ' / ' + formatMs(task.timeEstimate) : ''}</span>
         `;
         card.appendChild(meta);
 
+        const tags = formatTags(task);
+        if (tags.length) {
+          const tagWrap = document.createElement('div');
+          tagWrap.className = 'chips';
+          tags.forEach((t) => {
+            const chip = document.createElement('span');
+            chip.className = 'chip';
+            chip.textContent = t;
+            tagWrap.appendChild(chip);
+          });
+          card.appendChild(tagWrap);
+        }
+
         if (task.notes) {
           const notes = document.createElement('p');
-          notes.className = 'notes';
+          notes.className = 'notes truncate';
           notes.textContent = task.notes;
           card.appendChild(notes);
         }
 
-        if (task.subTasks && task.subTasks.length) {
+        // Tree view shows full hierarchy; flat view keeps previews
+        if (isTree) {
+          const children = task.children || [];
+          if (children.length) {
+            const treeBox = document.createElement('div');
+            treeBox.className = 'section';
+            const label = document.createElement('div');
+            label.className = 'section-title';
+            label.textContent = `Subtasks (${children.length})`;
+            treeBox.appendChild(label);
+            treeBox.appendChild(renderTree(children, 1));
+            card.appendChild(treeBox);
+          }
+        } else if (task.subTasks && task.subTasks.length) {
           const box = document.createElement('div');
           box.className = 'section subtasks';
           const label = document.createElement('div');
-          label.className = 'small';
-          label.textContent = 'Subtasks';
+          label.className = 'section-title';
+          label.textContent = `Subtasks (${task.subTasks.length})`;
           box.appendChild(label);
-          task.subTasks.forEach((st) => {
+          task.subTasks.slice(0, 4).forEach((st) => {
             const row = document.createElement('div');
             row.className = 'subtask';
             const name = document.createElement('span');
             name.textContent = st.title || '(untitled)';
             const time = document.createElement('span');
-            time.className = 'small';
+            time.className = 'muted';
             time.textContent = formatMs(st.timeSpent);
             row.appendChild(name);
             row.appendChild(time);
             box.appendChild(row);
           });
+          if (task.subTasks.length > 4) {
+            const more = document.createElement('div');
+            more.className = 'muted';
+            more.textContent = `+${task.subTasks.length - 4} more...`;
+            box.appendChild(more);
+          }
           card.appendChild(box);
         }
 
@@ -326,10 +842,10 @@
           const box = document.createElement('div');
           box.className = 'section attachments';
           const label = document.createElement('div');
-          label.className = 'small';
+          label.className = 'section-title';
           label.textContent = `Attachments (${task.attachments.length})`;
           box.appendChild(label);
-          task.attachments.forEach((att) => {
+          task.attachments.slice(0, 2).forEach((att) => {
             const row = document.createElement('div');
             row.className = 'attachment';
             const link = document.createElement('a');
@@ -338,29 +854,198 @@
             link.textContent = att.title || att.path || '(attachment)';
             link.rel = 'noreferrer';
             const type = document.createElement('span');
-            type.className = 'small';
+            type.className = 'muted';
             type.textContent = att.type || '';
             row.appendChild(link);
             row.appendChild(type);
             box.appendChild(row);
           });
+          if (task.attachments.length > 2) {
+            const more = document.createElement('div');
+            more.className = 'muted';
+            more.textContent = `+${task.attachments.length - 2} more...`;
+            box.appendChild(more);
+          }
           card.appendChild(box);
         }
+
+        const footer = document.createElement('div');
+        footer.className = 'card-footer';
+        const actions = document.createElement('div');
+        actions.className = 'actions tight';
+
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'ghost';
+        viewBtn.textContent = 'View details';
+        viewBtn.addEventListener('click', () => openDetail(task, isTree));
+
+        actions.appendChild(viewBtn);
+        footer.appendChild(actions);
+        card.appendChild(footer);
 
         return card;
       }
 
-      function formatTags(task) {
-        const ids = task.tagIds || [];
-        if (!ids.length) return unassigned;
-        return ids
-          .map((id) => state.tags[id] || unassigned)
-          .filter(Boolean)
-          .join(', ');
+      function renderTree(children, depth = 1) {
+        const wrap = document.createElement('div');
+        wrap.className = 'tree';
+        children.forEach((child) => {
+          const row = document.createElement('div');
+          row.className = `tree-row tree-indent-${Math.min(depth, 4)}`;
+          const name = document.createElement('div');
+          name.textContent = child.title || '(untitled)';
+          const time = document.createElement('span');
+          time.className = 'muted';
+          time.textContent = formatMs(child.timeSpent);
+          const status = document.createElement('span');
+          status.className = 'pill';
+          status.textContent = child.isDone ? 'Done' : 'Open';
+          const done = document.createElement('span');
+          done.className = 'muted';
+          done.textContent = formatDate(child.doneOn);
+          row.appendChild(name);
+          row.appendChild(status);
+          row.appendChild(done);
+          row.appendChild(time);
+          wrap.appendChild(row);
+          if (child.children && child.children.length) {
+            wrap.appendChild(renderTree(child.children, depth + 1));
+          }
+        });
+        return wrap;
+      }
+
+      function renderDetail() {
+        elModalRoot.innerHTML = '';
+        if (!state.viewTask) return;
+
+        const task = state.viewTask;
+        const overlay = document.createElement('div');
+        overlay.className = 'backdrop';
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeDetail();
+        });
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+
+        const header = document.createElement('div');
+        header.className = 'modal-header';
+        const title = document.createElement('div');
+        title.innerHTML = `<div class="muted" style="margin-bottom:4px;">Archived task</div><div style="font-size:18px;font-weight:800;line-height:1.4;">${task.title || '(untitled)'}</div>`;
+        const close = document.createElement('button');
+        close.className = 'close-btn';
+        close.textContent = 'Close';
+        close.addEventListener('click', closeDetail);
+        header.appendChild(title);
+        header.appendChild(close);
+        modal.appendChild(header);
+
+        const kv = document.createElement('div');
+        kv.className = 'kv';
+        kv.appendChild(kvItem('Done on', formatDate(task.doneOn)));
+        kv.appendChild(kvItem('Project', task.projectId ? state.projects[task.projectId] || unassigned : unassigned));
+        kv.appendChild(kvItem('Tags', formatTags(task).join(', ') || unassigned));
+        kv.appendChild(kvItem('Issue', task.issueId || '-'));
+        kv.appendChild(kvItem('Time spent', formatMs(task.timeSpent)));
+        kv.appendChild(kvItem('Estimate', formatMs(task.timeEstimate)));
+        kv.appendChild(kvItem('Created', formatDate(task.created)));
+        modal.appendChild(kv);
+
+        if (task.notes) {
+          const notesBox = document.createElement('div');
+          notesBox.className = 'section';
+          const label = document.createElement('div');
+          label.className = 'section-title';
+          label.textContent = 'Notes';
+          const notes = document.createElement('p');
+          notes.className = 'notes';
+          notes.textContent = task.notes;
+          notesBox.appendChild(label);
+          notesBox.appendChild(notes);
+          modal.appendChild(notesBox);
+        }
+
+        const subs = task.children || task.subTasks || [];
+        if (subs.length) {
+          const subBox = document.createElement('div');
+          subBox.className = 'section subtasks';
+          const label = document.createElement('div');
+          label.className = 'section-title';
+          label.textContent = `Subtasks (${subs.length})`;
+          subBox.appendChild(label);
+          subBox.appendChild(renderTree(subs, 1));
+          modal.appendChild(subBox);
+        }
+
+        const atts = task.attachments || [];
+        if (atts.length) {
+          const attBox = document.createElement('div');
+          attBox.className = 'section attachments';
+          const label = document.createElement('div');
+          label.className = 'section-title';
+          label.textContent = `Attachments (${atts.length})`;
+          attBox.appendChild(label);
+          atts.forEach((att) => {
+            const row = document.createElement('div');
+            row.className = 'attachment';
+            const link = document.createElement('a');
+            link.href = att.path || '#';
+            link.target = '_blank';
+            link.rel = 'noreferrer';
+            link.textContent = att.title || att.path || '(attachment)';
+            const type = document.createElement('span');
+            type.className = 'muted';
+            type.textContent = att.type || '';
+            row.appendChild(link);
+            row.appendChild(type);
+            attBox.appendChild(row);
+          });
+          modal.appendChild(attBox);
+        }
+
+        overlay.appendChild(modal);
+        elModalRoot.appendChild(overlay);
+      }
+
+      function kvItem(label, value) {
+        const wrap = document.createElement('div');
+        wrap.className = 'kv-item';
+        const l = document.createElement('div');
+        l.className = 'kv-label';
+        l.textContent = label;
+        const v = document.createElement('div');
+        v.className = 'kv-value';
+        v.textContent = value;
+        wrap.appendChild(l);
+        wrap.appendChild(v);
+        return wrap;
+      }
+
+      function attachChildren(task) {
+        // Build tree and return node with its children (if any)
+        const map = new Map();
+        state.tasks.forEach((t) => map.set(t.id, { ...t, children: [] }));
+        map.forEach((t) => {
+          if (t.parentId && map.has(t.parentId)) {
+            map.get(t.parentId).children.push(t);
+          }
+        });
+        return map.get(task.id) || task;
+      }
+
+      function openDetail(task, isTree) {
+        state.viewTask = isTree ? task : attachChildren(task);
+        renderDetail();
+      }
+
+      function closeDetail() {
+        state.viewTask = null;
+        renderDetail();
       }
 
       async function loadData() {
-        elStatus.textContent = 'Loading archived tasks…';
+        elStatus.textContent = 'Loading archived tasks...';
         elContent.innerHTML = '';
         try {
           const PluginAPI = await waitForPluginApi();
@@ -376,6 +1061,7 @@
         } catch (err) {
           console.error(err);
           elStatus.textContent = 'Failed to load archived tasks.';
+          elContent.innerHTML = '';
         }
       }
 
@@ -386,7 +1072,25 @@
 
       elReload.addEventListener('click', () => loadData());
 
+      elFilter.addEventListener('input', (e) => {
+        state.filter = e.target.value.trim();
+        render();
+      });
+
+      elViewMode.addEventListener('change', (e) => {
+        state.viewMode = e.target.value;
+        render();
+      });
+
+      elThemeToggle.addEventListener('click', () => {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(state.theme);
+        saveTheme(state.theme);
+      });
+
       // kick off
+      state.theme = getSavedTheme() || (prefersDark() ? 'dark' : 'light');
+      applyTheme(state.theme);
       loadData();
     </script>
   </body>
