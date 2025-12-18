@@ -16,9 +16,9 @@
         --accent-text: #c7eeff;
         --grad1: rgba(106, 200, 255, 0.06);
         --grad2: rgba(255, 146, 255, 0.06);
-        --surface-1: rgba(255, 255, 255, 0.03);
-        --surface-2: rgba(255, 255, 255, 0.05);
-        --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        --surface-1: rgba(255, 255, 255, 0.05);
+        --surface-2: rgba(255, 255, 255, 0.08);
+        --shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
         --radius: 12px;
         --text: #e6edf7;
         --focus-outline: rgba(106, 200, 255, 0.35);
@@ -174,6 +174,18 @@
         font-size: 13px;
         letter-spacing: 0.2px;
       }
+      .btn-xs {
+        height: 28px;
+        padding: 0 10px;
+        font-size: 12px;
+        border-radius: 999px;
+        line-height: 1;
+      }
+      .row-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
       .status {
         margin: 6px 0 16px;
         color: var(--muted);
@@ -280,13 +292,21 @@
       }
       .tree-row {
         display: grid;
-        grid-template-columns: 1fr auto auto auto;
+        grid-template-columns: minmax(0, 1fr) auto auto auto auto;
         gap: 8px;
         align-items: center;
         padding: 8px 10px;
         border-radius: 8px;
         background: var(--surface-1);
         border: 1px solid var(--border);
+      }
+      .tree-title {
+        min-width: 0;
+        font-weight: 600;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .tree-row .muted {
         justify-self: end;
@@ -315,13 +335,46 @@
       .subtask,
       .attachment {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        border-radius: 8px;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
         background: var(--surface-1);
         border: 1px solid var(--border);
+      }
+      .subtask-title {
+        min-width: 0;
+        font-weight: 600;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .subtask .row-actions {
+        justify-content: flex-end;
+      }
+      .subtask-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--accent-border);
+        flex: 0 0 auto;
+        box-shadow: 0 0 0 4px var(--surface-2);
+      }
+      .subtask-main {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        min-width: 0;
+      }
+      .subtask-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 13px;
       }
       .attachment a {
         color: inherit;
@@ -474,6 +527,7 @@
         tasks: [],
         tags: {},
         projects: {},
+        taskById: {},
         group: 'date',
         filter: '',
         viewTask: null,
@@ -544,23 +598,23 @@
           root.setProperty('--focus-shadow', '0 0 0 3px rgba(37, 99, 235, 0.14)');
           root.setProperty('--backdrop', 'rgba(15, 23, 42, 0.42)');
         } else {
-          root.setProperty('--bg', '#0f1115');
-          root.setProperty('--card', '#161a20');
-          root.setProperty('--muted', '#9ba3b4');
-          root.setProperty('--border', '#252a33');
-          root.setProperty('--accent', '#6ac8ff');
-          root.setProperty('--shadow', '0 12px 40px rgba(0, 0, 0, 0.35)');
-          root.setProperty('--text', '#e6edf7');
-          root.setProperty('--surface-1', 'rgba(255, 255, 255, 0.03)');
-          root.setProperty('--surface-2', 'rgba(255, 255, 255, 0.05)');
-          root.setProperty('--grad1', 'rgba(106, 200, 255, 0.06)');
-          root.setProperty('--grad2', 'rgba(255, 146, 255, 0.06)');
-          root.setProperty('--accent-bg', 'rgba(106, 200, 255, 0.14)');
-          root.setProperty('--accent-border', 'rgba(106, 200, 255, 0.28)');
-          root.setProperty('--accent-text', '#c7eeff');
-          root.setProperty('--focus-outline', 'rgba(106, 200, 255, 0.35)');
-          root.setProperty('--focus-shadow', '0 0 0 3px rgba(106, 200, 255, 0.12)');
-          root.setProperty('--backdrop', 'rgba(0, 0, 0, 0.65)');
+          root.setProperty('--bg', '#181b22');
+          root.setProperty('--card', '#212631');
+          root.setProperty('--muted', '#a6b2c5');
+          root.setProperty('--border', '#2f3542');
+          root.setProperty('--accent', '#8ab4ff');
+          root.setProperty('--shadow', '0 14px 34px rgba(0, 0, 0, 0.24)');
+          root.setProperty('--text', '#e8edf7');
+          root.setProperty('--surface-1', '#1d222c');
+          root.setProperty('--surface-2', '#232a35');
+          root.setProperty('--grad1', 'rgba(138, 180, 255, 0.10)');
+          root.setProperty('--grad2', 'rgba(129, 230, 217, 0.08)');
+          root.setProperty('--accent-bg', 'rgba(138, 180, 255, 0.16)');
+          root.setProperty('--accent-border', 'rgba(138, 180, 255, 0.32)');
+          root.setProperty('--accent-text', '#d8e6ff');
+          root.setProperty('--focus-outline', 'rgba(138, 180, 255, 0.42)');
+          root.setProperty('--focus-shadow', '0 0 0 3px rgba(138, 180, 255, 0.16)');
+          root.setProperty('--backdrop', 'rgba(0, 0, 0, 0.58)');
         }
         elThemeToggle.dataset.theme = theme;
         elThemeToggle.innerHTML =
@@ -772,8 +826,7 @@
         meta.className = 'meta';
         meta.innerHTML = `
           <span>Project: ${task.projectId ? state.projects[task.projectId] || unassigned : unassigned}</span>
-          <span>Issue: ${task.issueId || '-'}</span>
-          <span>Time: ${formatMs(task.timeSpent)}${task.timeEstimate ? ' / ' + formatMs(task.timeEstimate) : ''}</span>
+          <span>Submitted: ${formatDate(task.created)}</span>
         `;
         card.appendChild(meta);
 
@@ -790,80 +843,32 @@
           card.appendChild(tagWrap);
         }
 
-        if (task.notes) {
-          const notes = document.createElement('p');
-          notes.className = 'notes truncate';
-          notes.textContent = task.notes;
-          card.appendChild(notes);
-        }
-
-        // Tree view shows full hierarchy; flat view keeps previews
-        if (isTree) {
-          const children = task.children || [];
-          if (children.length) {
-            const treeBox = document.createElement('div');
-            treeBox.className = 'section';
-            const label = document.createElement('div');
-            label.className = 'section-title';
-            label.textContent = `Subtasks (${children.length})`;
-            treeBox.appendChild(label);
-            treeBox.appendChild(renderTree(children, 1));
-            card.appendChild(treeBox);
-          }
-        } else if (task.subTasks && task.subTasks.length) {
+        // Brief subtask preview: title + done date
+        const previewSubs = isTree ? task.children || [] : task.subTasks || [];
+        if (previewSubs.length) {
           const box = document.createElement('div');
           box.className = 'section subtasks';
           const label = document.createElement('div');
           label.className = 'section-title';
-          label.textContent = `Subtasks (${task.subTasks.length})`;
+          label.textContent = `Subtasks (${previewSubs.length})`;
           box.appendChild(label);
-          task.subTasks.slice(0, 4).forEach((st) => {
+          previewSubs.slice(0, 4).forEach((st) => {
             const row = document.createElement('div');
             row.className = 'subtask';
             const name = document.createElement('span');
+            name.className = 'subtask-title';
             name.textContent = st.title || '(untitled)';
-            const time = document.createElement('span');
-            time.className = 'muted';
-            time.textContent = formatMs(st.timeSpent);
+            const done = document.createElement('span');
+            done.className = 'muted';
+            done.textContent = formatDate(st.doneOn);
             row.appendChild(name);
-            row.appendChild(time);
+            row.appendChild(done);
             box.appendChild(row);
           });
-          if (task.subTasks.length > 4) {
+          if (previewSubs.length > 4) {
             const more = document.createElement('div');
             more.className = 'muted';
-            more.textContent = `+${task.subTasks.length - 4} more...`;
-            box.appendChild(more);
-          }
-          card.appendChild(box);
-        }
-
-        if (task.attachments && task.attachments.length) {
-          const box = document.createElement('div');
-          box.className = 'section attachments';
-          const label = document.createElement('div');
-          label.className = 'section-title';
-          label.textContent = `Attachments (${task.attachments.length})`;
-          box.appendChild(label);
-          task.attachments.slice(0, 2).forEach((att) => {
-            const row = document.createElement('div');
-            row.className = 'attachment';
-            const link = document.createElement('a');
-            link.href = att.path || '#';
-            link.target = '_blank';
-            link.textContent = att.title || att.path || '(attachment)';
-            link.rel = 'noreferrer';
-            const type = document.createElement('span');
-            type.className = 'muted';
-            type.textContent = att.type || '';
-            row.appendChild(link);
-            row.appendChild(type);
-            box.appendChild(row);
-          });
-          if (task.attachments.length > 2) {
-            const more = document.createElement('div');
-            more.className = 'muted';
-            more.textContent = `+${task.attachments.length - 2} more...`;
+            more.textContent = `+${previewSubs.length - 4} more...`;
             box.appendChild(more);
           }
           card.appendChild(box);
@@ -893,6 +898,7 @@
           const row = document.createElement('div');
           row.className = `tree-row tree-indent-${Math.min(depth, 4)}`;
           const name = document.createElement('div');
+          name.className = 'tree-title';
           name.textContent = child.title || '(untitled)';
           const time = document.createElement('span');
           time.className = 'muted';
@@ -903,10 +909,21 @@
           const done = document.createElement('span');
           done.className = 'muted';
           done.textContent = formatDate(child.doneOn);
+          const details = document.createElement('button');
+          details.className = 'ghost btn-xs';
+          details.type = 'button';
+          details.textContent = 'Details';
+          details.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDetail(child, true);
+          });
           row.appendChild(name);
           row.appendChild(status);
           row.appendChild(done);
           row.appendChild(time);
+          row.appendChild(details);
+          row.style.cursor = 'pointer';
+          row.addEventListener('click', () => openDetail(child, true));
           wrap.appendChild(row);
           if (child.children && child.children.length) {
             wrap.appendChild(renderTree(child.children, depth + 1));
@@ -943,7 +960,11 @@
 
         const kv = document.createElement('div');
         kv.className = 'kv';
+        kv.appendChild(kvItem('Status', task.isDone ? 'Done' : 'Open'));
         kv.appendChild(kvItem('Done on', formatDate(task.doneOn)));
+        if (task.parentId && state.taskById[task.parentId]) {
+          kv.appendChild(kvItem('Parent', state.taskById[task.parentId].title || '(untitled)'));
+        }
         kv.appendChild(kvItem('Project', task.projectId ? state.projects[task.projectId] || unassigned : unassigned));
         kv.appendChild(kvItem('Tags', formatTags(task).join(', ') || unassigned));
         kv.appendChild(kvItem('Issue', task.issueId || '-'));
@@ -1035,6 +1056,7 @@
       }
 
       function openDetail(task, isTree) {
+        if (!task) return;
         state.viewTask = isTree ? task : attachChildren(task);
         renderDetail();
       }
@@ -1055,6 +1077,7 @@
             PluginAPI.getAllProjects(),
           ]);
           state.tasks = tasks || [];
+          state.taskById = Object.fromEntries(state.tasks.map((t) => [t.id, t]));
           state.tags = Object.fromEntries(tags.map((t) => [t.id, t.title]));
           state.projects = Object.fromEntries(projects.map((p) => [p.id, p.title]));
           render();
