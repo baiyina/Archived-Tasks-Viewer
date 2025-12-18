@@ -3,26 +3,32 @@
 [English](#english) | [中文](#中文)
 
 ## English
-Read-only plugin for Super Productivity: view archived tasks grouped by date/tag/project, inspect details, and run entirely in an iframe UI.
+Read-only Super Productivity plugin to browse archived tasks with a clean, iframe-based UI.
 
 ### Compatibility
 - Super Productivity `>= 16.0.0`
 
 ### Features
-- Fetch archived tasks only (`PluginAPI.getArchivedTasks`)
-- Group by completion date / tag / project
-- Show details: project, tags, done date, issue, spent vs estimate, notes, subtasks, attachments
-- Pure HTML/JS in `index.html` (iframe view, no external deps)
+- Read-only access to archived tasks (`PluginAPI.getArchivedTasks`)
+- Grouping: completion date / tag / project
+- View modes: parent task tree or flat list
+- Filter by title/notes/tag/project
+- Per-card info: title, done date, project, tags, created/submit date
+- Subtask preview: title + done date (full details in modal)
+- Details modal: project, tags, done date, created, time spent/estimate, notes, subtasks, attachments
+- Light/Dark theme toggle (auto-detect on first load)
 
 ### Install & Use
-1) Create the zip from this folder (keep `manifest.json`, `plugin.js`, `index.html` at the zip root):
+1) Zip this folder (keep `manifest.json`, `plugin.js`, `index.html` at the zip root):
    ```powershell
    Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
    ```
-2) In Super Productivity: `Settings -> Plugins -> Upload plugin`, pick `archived-viewer-plugin.zip`, then enable it.
-3) Open the sidebar entry `Archived tasks`:
+2) In Super Productivity: `Settings -> Plugins -> Upload plugin`, choose the zip, enable it.
+3) Open sidebar `Archived tasks`:
    - Switch grouping: date / tag / project
-   - Click `Reload` to refresh archived data
+   - Switch view: parent tree / flat
+   - Filter text; click `Reload` to refresh
+   - Click `View details` for the full modal
 
 ### Permissions
 - `PluginAPI.getArchivedTasks`
@@ -31,32 +37,39 @@ Read-only plugin for Super Productivity: view archived tasks grouped by date/tag
 - `PluginAPI.showSnack`
 
 ### Notes
-- Read-only; never writes or edits tasks.
-- Tag grouping uses the first tag as the key; all tags still show on each card.
+- Strictly read-only; never edits tasks.
+- Tag grouping uses the first tag as the bucket key; all tags remain visible on cards.
+- Sample import file: `sample-import.json` (Super Productivity backup format) for quick testing.
 
 ---
 
 ## 中文
-Super Productivity 的只读插件：查看归档任务，按日期/标签/项目分组，并在 iframe 中展示详情。
+适用于 Super Productivity 的只读插件：在 iframe 界面浏览归档任务，支持分组、过滤和详情弹窗。
 
 ### 兼容性
 - Super Productivity `>= 16.0.0`
 
 ### 功能
 - 只读获取归档任务（`PluginAPI.getArchivedTasks`）
-- 按完成日期 / 标签 / 项目分组
-- 展示详情：项目、标签、完成时间、Issue、耗时/预估、备注、子任务、附件
-- 纯前端实现（`index.html`），无外部依赖
+- 分组：完成日期 / 标签 / 项目
+- 视图：父任务树 / 平铺列表
+- 过滤：标题、备注、标签、项目
+- 卡片展示：标题、完成日期、项目、标签、创建/提交时间
+- 子任务简览：标题 + 完成时间（更多信息在详情弹窗查看）
+- 详情弹窗：项目、标签、完成时间、创建时间、耗时/预估、备注、子任务、附件
+- 明暗主题切换（首次自动跟随系统）
 
 ### 安装与使用
-1) 在本目录生成 zip（确保 `manifest.json`、`plugin.js`、`index.html` 在压缩包根目录）：
+1) 在本目录生成 zip（确保 `manifest.json`、`plugin.js`、`index.html` 位于压缩包根目录）：
    ```powershell
    Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
    ```
-2) 打开 Super Productivity：`Settings -> Plugins -> Upload plugin`，选择 zip 并启用。
-3) 侧边栏出现 `Archived tasks`：
-   - 选择分组方式（date/tag/project）
-   - 点击 `Reload` 重新拉取归档数据
+2) 在 Super Productivity：`Settings -> Plugins -> Upload plugin`，选择 zip 并启用。
+3) 打开侧边栏 `Archived tasks`：
+   - 切换分组：日期 / 标签 / 项目
+   - 切换视图：父任务树 / 平铺
+   - 文本过滤，点击 `Reload` 重新拉取
+   - 点击 `View details` 打开完整详情
 
 ### 权限
 - `PluginAPI.getArchivedTasks`
@@ -65,5 +78,6 @@ Super Productivity 的只读插件：查看归档任务，按日期/标签/项�
 - `PluginAPI.showSnack`
 
 ### 备注
-- 全程只读，不会修改任务数据。
-- 标签分组使用任务的第一个标签作为分组键，卡片仍显示所有标签。
+- 完全只读，不会修改任务数据。
+- 标签分组使用首个标签作为分组键，卡片仍会展示所有标签。
+- 提供测试用例 `sample-import.json`（Super Productivity 备份格式），可快速验证。
