@@ -23,7 +23,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
    ```powershell
    Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
    ```
-2) In Super Productivity: `Settings -> Plugins -> Upload plugin`, choose the zip, enable it.
+2) Download from GitHub Releases (recommended): [Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) → `archived-viewer-plugin-<version>.zip`, then in Super Productivity go to `Settings -> Plugins -> Upload plugin` and enable it.
+   - Or, use the local zip you just built.
 3) Open sidebar `Archived tasks`:
    - Switch grouping: date / tag / project
    - Switch view: parent tree / flat
@@ -64,7 +65,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
    ```powershell
    Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
    ```
-2) 在 Super Productivity：`Settings -> Plugins -> Upload plugin`，选择 zip 并启用。
+2) 从 GitHub Releases 下载（推荐）：[Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) 中获取 `archived-viewer-plugin-<version>.zip`；然后在 Super Productivity 里打开 `Settings -> Plugins -> Upload plugin` 上传并启用。
+   - 或使用刚才本地打包的 zip。
 3) 打开侧边栏 `Archived tasks`：
    - 切换分组：日期 / 标签 / 项目
    - 切换视图：父任务树 / 平铺
