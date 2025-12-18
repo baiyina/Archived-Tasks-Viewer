@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Archived Tasks Viewer</title>
+    <style>
+      body {
+        font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 16px;
+        background: var(--bg, #121212);
+        color: var(--text-color, #e0e0e0);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      select,
+      button {
+        background: var(--card-bg, #1e1e1e);
+        color: inherit;
+        border: 1px solid var(--divider-color, #2c2c2c);
+        padding: 6px 10px;
+        border-radius: 6px;
+      }
+      button {
+        cursor: pointer;
+      }
+      .status {
+        margin: 8px 0 16px;
+        color: var(--text-color-muted, #9e9e9e);
+      }
+      .group {
+        margin-bottom: 18px;
+      }
+      .group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--divider-color, #2c2c2c);
+        padding-bottom: 4px;
+      }
+      .group-title {
+        font-weight: 700;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: var(--card-bg, #1e1e1e);
+        border-radius: var(--card-border-radius, 8px);
+        box-shadow: var(--whiteframe-shadow-4dp, 0 2px 4px rgba(0, 0, 0, 0.4));
+        padding: 12px;
+        border: 1px solid var(--divider-color, #2c2c2c);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .task-title {
+        font-weight: 700;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        padding: 3px 6px;
+        border-radius: 6px;
+        background: var(--bg-darker, rgba(255, 255, 255, 0.05));
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: var(--text-color-muted, #9e9e9e);
+        font-size: 13px;
+      }
+      .section {
+        border-top: 1px solid var(--divider-color, #2c2c2c);
+        padding-top: 6px;
+      }
+      .subtasks,
+      .attachments {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .subtask,
+      .attachment {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .attachment a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .small {
+        font-size: 12px;
+        color: var(--text-color-muted, #9e9e9e);
+      }
+      .notes {
+        margin: 0;
+        white-space: pre-wrap;
+        color: var(--text-color, #e0e0e0);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Archived Tasks Viewer</h1>
+    <div class="toolbar">
+      <label>
+        Group by:
+        <select id="group-select">
+          <option value="date">Completion date</option>
+          <option value="tag">Tag</option>
+          <option value="project">Project</option>
+        </select>
+      </label>
+      <button id="reload-btn">Reload</button>
+      <span id="count" class="small"></span>
+    </div>
+    <div id="status" class="status">Loading archived tasks…</div>
+    <div id="content"></div>
+
+    <script>
+      const state = {
+        tasks: [],
+        tags: {},
+        projects: {},
+        group: 'date',
+      };
+
+      const waitForPluginApi = async () => {
+        while (!window.PluginAPI) {
+          await new Promise((r) => setTimeout(r, 50));
+        }
+        return window.PluginAPI;
+      };
+
+      const elStatus = document.getElementById('status');
+      const elContent = document.getElementById('content');
+      const elGroup = document.getElementById('group-select');
+      const elCount = document.getElementById('count');
+      const elReload = document.getElementById('reload-btn');
+
+      const formatDate = (ts) => {
+        if (!ts) return '-';
+        const d = new Date(ts);
+        return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+      };
+
+      const formatMs = (ms) => {
+        if (!ms) return '-';
+        const sec = Math.floor(ms / 1000);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = sec % 60;
+        const parts = [];
+        if (h) parts.push(h + 'h');
+        if (m) parts.push(m + 'm');
+        if (s || parts.length === 0) parts.push(s + 's');
+        return parts.join(' ');
+      };
+
+      const unassigned = 'Unassigned';
+
+      function groupTasks(tasks, mode) {
+        const groups = new Map();
+        const getDoneOn = (t) =>
+          typeof t.doneOn === 'number' ? t.doneOn : t.created || Date.now();
+
+        for (const task of tasks) {
+          const key =
+            mode === 'date'
+              ? new Date(getDoneOn(task)).toISOString().slice(0, 10)
+              : mode === 'tag'
+              ? (task.tagIds && task.tagIds[0]) || unassigned
+              : task.projectId || unassigned;
+
+          if (!groups.has(key)) {
+            groups.set(key, { key, tasks: [] });
+          }
+          groups.get(key).tasks.push(task);
+        }
+
+        return Array.from(groups.values())
+          .map((g) => ({
+            key: g.key,
+            label:
+              mode === 'date'
+                ? g.key
+                : mode === 'tag'
+                ? state.tags[g.key] || unassigned
+                : state.projects[g.key] || unassigned,
+            tasks: g.tasks.sort((a, b) => getDoneOn(b) - getDoneOn(a)),
+          }))
+          .sort((a, b) => {
+            if (mode === 'date') {
+              return new Date(b.key).getTime() - new Date(a.key).getTime();
+            }
+            return a.label.localeCompare(b.label);
+          });
+      }
+
+      function render() {
+        if (!state.tasks.length) {
+          elStatus.textContent = 'No archived tasks found.';
+          elContent.innerHTML = '';
+          elCount.textContent = '';
+          return;
+        }
+        elStatus.textContent = '';
+        const groups = groupTasks(state.tasks, state.group);
+        elCount.textContent = `${state.tasks.length} tasks`;
+
+        const frag = document.createDocumentFragment();
+        groups.forEach((group) => {
+          const section = document.createElement('section');
+          section.className = 'group';
+
+          const header = document.createElement('div');
+          header.className = 'group-header';
+          const title = document.createElement('div');
+          title.className = 'group-title';
+          title.textContent = group.label;
+          const count = document.createElement('span');
+          count.className = 'small';
+          count.textContent = `${group.tasks.length} task(s)`;
+          header.appendChild(title);
+          header.appendChild(count);
+          section.appendChild(header);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+          group.tasks.forEach((task) => grid.appendChild(renderTask(task)));
+          section.appendChild(grid);
+
+          frag.appendChild(section);
+        });
+
+        elContent.innerHTML = '';
+        elContent.appendChild(frag);
+      }
+
+      function renderTask(task) {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'title-row';
+        const title = document.createElement('div');
+        title.className = 'task-title';
+        title.textContent = task.title || '(untitled)';
+        const doneOn = document.createElement('span');
+        doneOn.className = 'pill';
+        doneOn.textContent = formatDate(task.doneOn);
+        titleRow.appendChild(title);
+        titleRow.appendChild(doneOn);
+        card.appendChild(titleRow);
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = `
+          <span>Project: ${task.projectId ? state.projects[task.projectId] || unassigned : unassigned}</span>
+          <span>Tags: ${formatTags(task)}</span>
+          <span>Issue: ${task.issueId || '-'}</span>
+          <span>Time: ${formatMs(task.timeSpent)}${task.timeEstimate ? ' / ' + formatMs(task.timeEstimate) : ''}</span>
+        `;
+        card.appendChild(meta);
+
+        if (task.notes) {
+          const notes = document.createElement('p');
+          notes.className = 'notes';
+          notes.textContent = task.notes;
+          card.appendChild(notes);
+        }
+
+        if (task.subTasks && task.subTasks.length) {
+          const box = document.createElement('div');
+          box.className = 'section subtasks';
+          const label = document.createElement('div');
+          label.className = 'small';
+          label.textContent = 'Subtasks';
+          box.appendChild(label);
+          task.subTasks.forEach((st) => {
+            const row = document.createElement('div');
+            row.className = 'subtask';
+            const name = document.createElement('span');
+            name.textContent = st.title || '(untitled)';
+            const time = document.createElement('span');
+            time.className = 'small';
+            time.textContent = formatMs(st.timeSpent);
+            row.appendChild(name);
+            row.appendChild(time);
+            box.appendChild(row);
+          });
+          card.appendChild(box);
+        }
+
+        if (task.attachments && task.attachments.length) {
+          const box = document.createElement('div');
+          box.className = 'section attachments';
+          const label = document.createElement('div');
+          label.className = 'small';
+          label.textContent = `Attachments (${task.attachments.length})`;
+          box.appendChild(label);
+          task.attachments.forEach((att) => {
+            const row = document.createElement('div');
+            row.className = 'attachment';
+            const link = document.createElement('a');
+            link.href = att.path || '#';
+            link.target = '_blank';
+            link.textContent = att.title || att.path || '(attachment)';
+            link.rel = 'noreferrer';
+            const type = document.createElement('span');
+            type.className = 'small';
+            type.textContent = att.type || '';
+            row.appendChild(link);
+            row.appendChild(type);
+            box.appendChild(row);
+          });
+          card.appendChild(box);
+        }
+
+        return card;
+      }
+
+      function formatTags(task) {
+        const ids = task.tagIds || [];
+        if (!ids.length) return unassigned;
+        return ids
+          .map((id) => state.tags[id] || unassigned)
+          .filter(Boolean)
+          .join(', ');
+      }
+
+      async function loadData() {
+        elStatus.textContent = 'Loading archived tasks…';
+        elContent.innerHTML = '';
+        try {
+          const PluginAPI = await waitForPluginApi();
+          const [tasks, tags, projects] = await Promise.all([
+            PluginAPI.getArchivedTasks(),
+            PluginAPI.getAllTags(),
+            PluginAPI.getAllProjects(),
+          ]);
+          state.tasks = tasks || [];
+          state.tags = Object.fromEntries(tags.map((t) => [t.id, t.title]));
+          state.projects = Object.fromEntries(projects.map((p) => [p.id, p.title]));
+          render();
+        } catch (err) {
+          console.error(err);
+          elStatus.textContent = 'Failed to load archived tasks.';
+        }
+      }
+
+      elGroup.addEventListener('change', (e) => {
+        state.group = e.target.value;
+        render();
+      });
+
+      elReload.addEventListener('click', () => loadData());
+
+      // kick off
+      loadData();
+    </script>
+  </body>
+</html>
