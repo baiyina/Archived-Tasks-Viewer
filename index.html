@@ -108,6 +108,14 @@
       .seg-btn:hover:not(.active) {
         color: var(--text);
       }
+      .seg-compact .seg-btn {
+        padding: 4px 10px;
+        height: 28px;
+        font-size: 12px;
+      }
+      .hide {
+        display: none !important;
+      }
       .field {
         display: flex;
         flex-direction: column;
@@ -472,6 +480,92 @@
       .tight {
         gap: 6px;
       }
+      /* Calendar */
+      .calendar-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+      .calendar-toolbar .left,
+      .calendar-toolbar .right {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .calendar-toolbar .range-label {
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .calendar-day {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px;
+        height: 220px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .calendar-day-week {
+        height: 520px;
+      }
+      .calendar-day-month {
+        height: 200px;
+      }
+      .calendar-day.today {
+        border-color: var(--accent-border);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+      }
+      .calendar-day-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .calendar-day-header .muted {
+        font-weight: 500;
+      }
+      .calendar-task {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .calendar-task-title {
+        font-weight: 650;
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .calendar-empty {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .calendar-day-body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow: auto;
+        flex: 1;
+        min-height: 0;
+        padding-right: 4px;
+      }
       .truncate {
         display: -webkit-box;
         -webkit-line-clamp: 3;
@@ -568,6 +662,13 @@
       </div>
       <div class="toolbar">
         <div class="field">
+          <span>Screen</span>
+          <div class="segmented" data-field="screen">
+            <button type="button" class="seg-btn" data-value="tasks">Tasks</button>
+            <button type="button" class="seg-btn" data-value="calendar">Calendar</button>
+          </div>
+        </div>
+        <div class="field hide-when-calendar">
           <span>Group by</span>
           <div class="segmented" data-field="group">
             <button type="button" class="seg-btn" data-value="date">Completion date</button>
@@ -575,7 +676,7 @@
             <button type="button" class="seg-btn" data-value="project">Project</button>
           </div>
         </div>
-        <div class="field">
+        <div class="field hide-when-calendar">
           <span>View mode</span>
           <div class="segmented" data-field="view">
             <button type="button" class="seg-btn" data-value="parent">Parent tasks (tree)</button>
@@ -598,11 +699,15 @@
         tags: {},
         projects: {},
         taskById: {},
+        screen: 'tasks',
         group: 'date',
         filter: '',
         viewTask: null,
         viewMode: 'parent',
         theme: 'dark',
+        calendarView: 'week',
+        calendarDate: Date.now(),
+        locale: navigator.language || 'en-US',
       };
 
       const waitForPluginApi = async () => {
@@ -618,6 +723,7 @@
       const elReload = document.getElementById('reload-btn');
       const elFilter = document.getElementById('filter-input');
       const elModalRoot = document.getElementById('modal-root');
+      const elScreenSeg = document.querySelector('.segmented[data-field="screen"]');
       const elGroupSeg = document.querySelector('.segmented[data-field="group"]');
       const elViewSeg = document.querySelector('.segmented[data-field="view"]');
       const elThemeToggle = document.getElementById('theme-toggle');
@@ -736,10 +842,79 @@
         });
       };
 
+      const getLocale = () => state.locale || navigator.language || 'en-US';
+
       const formatDate = (ts) => {
         if (!ts) return '-';
         const d = new Date(ts);
-        return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+        return isNaN(d.getTime()) ? '-' : d.toLocaleDateString(getLocale());
+      };
+      const formatTime = (ts) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return isNaN(d.getTime())
+          ? ''
+          : d.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' });
+      };
+
+      const startOfDay = (d) => {
+        const nd = new Date(d);
+        nd.setHours(0, 0, 0, 0);
+        return nd;
+      };
+      const formatDayKey = (d) => startOfDay(d).toISOString().slice(0, 10);
+      const addDays = (d, n) => {
+        const nd = new Date(d);
+        nd.setDate(nd.getDate() + n);
+        return nd;
+      };
+      const addMonths = (d, n) => {
+        const nd = new Date(d);
+        nd.setMonth(nd.getMonth() + n);
+        return nd;
+      };
+      const startOfWeek = (d) => {
+        const nd = startOfDay(d);
+        const day = nd.getDay(); // 0 Sunday
+        const diff = (day === 0 ? -6 : 1 - day);
+        return addDays(nd, diff);
+      };
+      const startOfMonth = (d) => {
+        const nd = startOfDay(d);
+        nd.setDate(1);
+        return nd;
+      };
+      const isSameDay = (a, b) => formatDayKey(a) === formatDayKey(b);
+      const isToday = (d) => isSameDay(d, new Date());
+      const formatDayLabel = (d) =>
+        d.toLocaleDateString(getLocale(), { weekday: 'short', month: 'short', day: 'numeric' });
+      const formatDayLabelLocale = (d, locale) =>
+        d.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+      const formatTimeLocale = (ts, locale) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return isNaN(d.getTime())
+          ? ''
+          : d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+      };
+      const getWeekDays = (base) => {
+        const start = startOfWeek(base);
+        return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+      };
+      const getMonthDays = (base) => {
+        const startMonth = startOfMonth(base);
+        const lastOfMonth = addDays(addMonths(startMonth, 1), -1);
+        const startGrid = startOfWeek(startMonth);
+        const days = [];
+        let cursor = startGrid;
+        while (true) {
+          days.push(cursor);
+          cursor = addDays(cursor, 1);
+          if (cursor > lastOfMonth && cursor.getDay() === 1) {
+            break;
+          }
+        }
+        return days;
       };
 
       const formatMs = (ms) => {
@@ -763,6 +938,13 @@
       };
 
       const textIncludes = (text, term) => (text || '').toLowerCase().includes(term);
+
+      const updateVisibility = () => {
+        const hideOnCal = document.querySelectorAll('.hide-when-calendar');
+        hideOnCal.forEach((el) => {
+          el.classList.toggle('hide', state.screen === 'calendar');
+        });
+      };
 
       const matchTask = (t, q) => {
         if (!q) return true;
@@ -859,10 +1041,8 @@
       function render() {
         const tree = buildTree(state.tasks);
         const filteredTree = filterTree(tree, state.filter);
-        const filteredFlat =
-          state.viewMode === 'flat'
-            ? filterTasks(flatten(tree), state.filter)
-            : flatten(filteredTree);
+        const flatAll = flatten(tree);
+        const filteredFlat = filterTasks(flatAll, state.filter);
 
         if (!state.tasks.length) {
           elStatus.textContent = 'No archived tasks found.';
@@ -871,21 +1051,35 @@
           renderDetail();
           return;
         }
-        if (!filteredFlat.length) {
+        if (state.screen === 'calendar') {
+          elCount.textContent = `${filteredFlat.length} of ${state.tasks.length} tasks`;
+          if (!filteredFlat.length) {
+            elStatus.textContent = 'No tasks match the current filter.';
+            elContent.innerHTML = '';
+            renderDetail();
+            return;
+          }
+          elStatus.textContent = '';
+          renderCalendar(filteredFlat);
+          renderDetail();
+          return;
+        }
+
+        const filteredForView =
+          state.viewMode === 'flat' ? filteredFlat : flatten(filteredTree);
+
+        if (!filteredForView.length) {
           elStatus.textContent = 'No tasks match the current filter.';
           elContent.innerHTML = '';
-          elCount.textContent = `${filteredFlat.length} of ${state.tasks.length} tasks`;
+          elCount.textContent = `${filteredForView.length} of ${state.tasks.length} tasks`;
           renderDetail();
           return;
         }
 
         elStatus.textContent = '';
-        const listToGroup =
-          state.viewMode === 'parent'
-            ? filteredTree
-            : filterTasks(state.tasks, state.filter);
+        const listToGroup = state.viewMode === 'parent' ? filteredTree : filteredFlat;
         const groups = groupTasks(listToGroup, state.group);
-        elCount.textContent = `${filteredFlat.length} of ${state.tasks.length} tasks`;
+        elCount.textContent = `${filteredForView.length} of ${state.tasks.length} tasks`;
 
         const frag = document.createDocumentFragment();
         groups.forEach((group) => {
@@ -917,6 +1111,152 @@
         elContent.innerHTML = '';
         elContent.appendChild(frag);
         renderDetail();
+      }
+
+      function renderCalendar(tasks) {
+        const calLocale = 'en-US';
+        const byDay = new Map();
+        tasks.forEach((t) => {
+          const key = formatDayKey(getDoneOn(t));
+          if (!byDay.has(key)) byDay.set(key, []);
+          byDay.get(key).push(t);
+        });
+        byDay.forEach((arr) => arr.sort((a, b) => getDoneOn(a) - getDoneOn(b)));
+
+        const baseDate = new Date(state.calendarDate);
+        const isWeek = state.calendarView === 'week';
+        const days = isWeek ? getWeekDays(baseDate) : getMonthDays(baseDate);
+        const rangeLabel = isWeek
+          ? `${formatDayLabelLocale(days[0], calLocale)} - ${formatDayLabelLocale(
+              days[days.length - 1],
+              calLocale,
+            )}`
+          : baseDate.toLocaleDateString(calLocale, { month: 'long', year: 'numeric' });
+
+        const container = document.createElement('div');
+
+        const toolbar = document.createElement('div');
+        toolbar.className = 'calendar-toolbar';
+
+        const left = document.createElement('div');
+        left.className = 'left';
+        const label = document.createElement('span');
+        label.className = 'range-label';
+        label.textContent = rangeLabel;
+        left.appendChild(label);
+
+        const viewSeg = document.createElement('div');
+        viewSeg.className = 'segmented seg-compact';
+        ['week', 'month'].forEach((mode) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'seg-btn';
+          btn.dataset.value = mode;
+          btn.textContent = mode === 'week' ? 'Week' : 'Month';
+          btn.classList.toggle('active', state.calendarView === mode);
+          btn.addEventListener('click', () => {
+            state.calendarView = mode;
+            render();
+          });
+          viewSeg.appendChild(btn);
+        });
+        left.appendChild(viewSeg);
+
+        const right = document.createElement('div');
+        right.className = 'right';
+        const prev = document.createElement('button');
+        prev.type = 'button';
+        prev.className = 'ghost btn-sm';
+        prev.textContent = 'Prev';
+        prev.addEventListener('click', () => {
+          const nextDate =
+            state.calendarView === 'week'
+              ? addDays(baseDate, -7)
+              : addMonths(baseDate, -1);
+          state.calendarDate = nextDate.getTime();
+          render();
+        });
+        const today = document.createElement('button');
+        today.type = 'button';
+        today.className = 'ghost btn-sm';
+        today.textContent = 'Today';
+        today.addEventListener('click', () => {
+          state.calendarDate = Date.now();
+          render();
+        });
+        const next = document.createElement('button');
+        next.type = 'button';
+        next.className = 'ghost btn-sm';
+        next.textContent = 'Next';
+        next.addEventListener('click', () => {
+          const nextDate =
+            state.calendarView === 'week'
+              ? addDays(baseDate, 7)
+              : addMonths(baseDate, 1);
+          state.calendarDate = nextDate.getTime();
+          render();
+        });
+        right.appendChild(prev);
+        right.appendChild(today);
+        right.appendChild(next);
+
+        toolbar.appendChild(left);
+        toolbar.appendChild(right);
+
+        const grid = document.createElement('div');
+        grid.className = 'calendar-grid';
+
+        days.forEach((day) => {
+          const key = formatDayKey(day);
+          const dayTasks = byDay.get(key) || [];
+
+          const col = document.createElement('div');
+          col.className = `calendar-day ${isWeek ? 'calendar-day-week' : 'calendar-day-month'}`;
+          if (isToday(day)) {
+            col.classList.add('today');
+          }
+
+          const header = document.createElement('div');
+          header.className = 'calendar-day-header';
+          const leftH = document.createElement('span');
+          leftH.textContent = day.toLocaleDateString(calLocale, { weekday: 'short' });
+          const rightH = document.createElement('span');
+          rightH.className = 'muted';
+          rightH.textContent = day.getDate();
+          header.appendChild(leftH);
+          header.appendChild(rightH);
+          col.appendChild(header);
+
+          const body = document.createElement('div');
+          body.className = 'calendar-day-body';
+
+          if (!dayTasks.length) {
+            const empty = document.createElement('div');
+            empty.className = 'calendar-empty';
+            empty.textContent = 'No tasks';
+            body.appendChild(empty);
+          } else {
+            dayTasks.forEach((task) => {
+              const item = document.createElement('div');
+              item.className = 'calendar-task';
+              const title = document.createElement('p');
+              title.className = 'calendar-task-title';
+              title.textContent = task.title || '(untitled)';
+              item.appendChild(title);
+              item.addEventListener('click', () => openDetail(task, false));
+              body.appendChild(item);
+            });
+          }
+
+          col.appendChild(body);
+          grid.appendChild(col);
+        });
+
+        container.appendChild(toolbar);
+        container.appendChild(grid);
+
+        elContent.innerHTML = '';
+        elContent.appendChild(container);
       }
 
       function renderTask(task, isTree) {
@@ -1208,6 +1548,7 @@
             PluginAPI.getAllTags(),
             PluginAPI.getAllProjects(),
           ]);
+          state.locale = PluginAPI?.cfg?.lang?.code || navigator.language || 'en-US';
           state.tasks = tasks || [];
           state.taskById = Object.fromEntries(state.tasks.map((t) => [t.id, t]));
           state.tags = Object.fromEntries(tags.map((t) => [t.id, t.title]));
@@ -1243,12 +1584,20 @@
         render();
       });
 
+      wireSegmented(elScreenSeg, (val) => {
+        state.screen = val;
+        updateVisibility();
+        render();
+      });
+
+      setSegmentedValue(elScreenSeg, state.screen);
       setSegmentedValue(elGroupSeg, state.group);
       setSegmentedValue(elViewSeg, state.viewMode);
 
       // kick off
       state.theme = getSavedTheme() || (prefersDark() ? 'dark' : 'light');
       applyTheme(state.theme);
+      updateVisibility();
       loadData();
     </script>
   </body>

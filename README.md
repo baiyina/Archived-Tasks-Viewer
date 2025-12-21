@@ -10,8 +10,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 
 ### Features
 - Read-only access to archived tasks (`PluginAPI.getArchivedTasks`)
-- Grouping: completion date / tag / project
-- View modes: parent task tree or flat list
+- Screens: `Tasks` (list) and `Calendar` (week/month)
+- Tasks screen: grouping by completion date / tag / project; view as parent task tree or flat list
 - Filter by title/notes/tag/project
 - Per-card info: title, done date, project, tags, created/submit date
 - Subtask preview: title + done date (full details in modal)
@@ -26,8 +26,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 2) Download from GitHub Releases (recommended): [Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) → `archived-viewer-plugin-<version>.zip`, then in Super Productivity go to `Settings -> Plugins -> Upload plugin` and enable it.
    - Or, use the local zip you just built.
 3) Open sidebar `Archived tasks`:
-   - Switch grouping: date / tag / project
-   - Switch view: parent tree / flat
+   - Screen: `Tasks` (list) or `Calendar` (week/month)
+   - If `Tasks` screen: switch grouping (date/tag/project) and view (parent tree/flat)
    - Filter text; click `Reload` to refresh
    - Click `View details` for the full modal
 
@@ -41,6 +41,7 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 - Strictly read-only; never edits tasks.
 - Tag grouping uses the first tag as the bucket key; all tags remain visible on cards.
 - Sample import file: `sample-import.json` (Super Productivity backup format) for quick testing.
+- If this plugin helps you, consider leaving a ⭐ on GitHub — it tells me it’s useful. I’ll keep polishing it and follow up in discussions when time allows.
 
 ---
 
@@ -52,8 +53,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 
 ### 功能
 - 只读获取归档任务（`PluginAPI.getArchivedTasks`）
-- 分组：完成日期 / 标签 / 项目
-- 视图：父任务树 / 平铺列表
+- 两个界面：`Tasks`（列表）与 `Calendar`（周/月）
+- Tasks 界面：按完成日期/标签/项目分组，视图可选父任务树或平铺
 - 过滤：标题、备注、标签、项目
 - 卡片展示：标题、完成日期、项目、标签、创建/提交时间
 - 子任务简览：标题 + 完成时间（更多信息在详情弹窗查看）
@@ -68,8 +69,8 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 2) 从 GitHub Releases 下载（推荐）：[Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) 中获取 `archived-viewer-plugin-<version>.zip`；然后在 Super Productivity 里打开 `Settings -> Plugins -> Upload plugin` 上传并启用。
    - 或使用刚才本地打包的 zip。
 3) 打开侧边栏 `Archived tasks`：
-   - 切换分组：日期 / 标签 / 项目
-   - 切换视图：父任务树 / 平铺
+   - Screen：`Tasks`（列表）或 `Calendar`（周/月）
+   - 在 `Tasks` 下切换分组（日期/标签/项目）与视图（父任务树/平铺）
    - 文本过滤，点击 `Reload` 重新拉取
    - 点击 `View details` 打开完整详情
 
@@ -83,3 +84,4 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 - 完全只读，不会修改任务数据。
 - 标签分组使用首个标签作为分组键，卡片仍会展示所有标签。
 - 提供测试用例 `sample-import.json`（Super Productivity 备份格式），可快速验证。
+- 如果这个插件对你有帮助，欢迎在 GitHub 点亮一个 ⭐。这会让我知道它有价值，也便于我抽空继续优化并关注讨论区。
