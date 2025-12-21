@@ -2,7 +2,7 @@
   "name": "Archived Tasks Viewer",
   "id": "archived-tasks-viewer",
   "manifestVersion": 1,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "minSupVersion": "16.0.0",
   "description": "Read-only view of archived tasks: group by completion date/tag/project and inspect details/attachments.",
   "hooks": [],
