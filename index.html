@@ -6,24 +6,24 @@
     <title>Archived Tasks Viewer</title>
     <style>
       :root {
-        --bg: #0f1115;
-        --card: #161a20;
-        --muted: #9ba3b4;
-        --border: #252a33;
-        --accent: #6ac8ff;
-        --accent-bg: rgba(106, 200, 255, 0.14);
-        --accent-border: rgba(106, 200, 255, 0.28);
-        --accent-text: #c7eeff;
-        --grad1: rgba(106, 200, 255, 0.06);
-        --grad2: rgba(255, 146, 255, 0.06);
-        --surface-1: rgba(255, 255, 255, 0.05);
-        --surface-2: rgba(255, 255, 255, 0.08);
-        --shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+        --bg: #f8f8f7;
+        --card: #ffffff;
+        --muted: #4b5563;
+        --border: rgba(0, 0, 0, 0.08);
+        --accent: #3b82f6;
+        --accent-bg: rgba(59, 130, 246, 0.12);
+        --accent-border: rgba(59, 130, 246, 0.28);
+        --accent-text: #1d4ed8;
+        --grad1: transparent;
+        --grad2: transparent;
+        --surface-1: #f3f4f6;
+        --surface-2: #eef1f7;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
         --radius: 12px;
-        --text: #e6edf7;
-        --focus-outline: rgba(106, 200, 255, 0.35);
-        --focus-shadow: 0 0 0 3px rgba(106, 200, 255, 0.12);
-        --backdrop: rgba(0, 0, 0, 0.65);
+        --text: #1f2937;
+        --focus-outline: rgba(59, 130, 246, 0.35);
+        --focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        --backdrop: rgba(0, 0, 0, 0.6);
       }
       * {
         box-sizing: border-box;
@@ -31,17 +31,20 @@
       body {
         font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
         margin: 0;
-        padding: 18px;
-        background: radial-gradient(circle at 20% 20%, var(--grad1), transparent 25%),
-          radial-gradient(circle at 80% 0%, var(--grad2), transparent 25%), var(--bg);
+        padding: 16px 12px;
+        background: var(--bg);
         color: var(--text, #e6edf7);
+      }
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
       }
       .topbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 14px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
       h1 {
         margin: 0;
@@ -72,16 +75,46 @@
         display: flex;
         flex-wrap: wrap;
         align-items: flex-end;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .segmented {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px;
+        height: 38px;
+      }
+      .seg-btn {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        height: 30px;
+        cursor: pointer;
+        transition: all 0.12s ease;
+      }
+      .seg-btn.active {
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        color: var(--accent-text);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      }
+      .seg-btn:hover:not(.active) {
+        color: var(--text);
       }
       .field {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
         color: var(--muted);
-        font-size: 13px;
-        min-width: 200px;
+        font-size: 12px;
+        min-width: 180px;
         flex: 1;
       }
       .field-inline {
@@ -98,10 +131,10 @@
         color: inherit;
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 0 14px;
-        font-size: 14px;
-        height: 44px;
-        line-height: 1.1;
+        padding: 0 12px;
+        font-size: 13px;
+        height: 38px;
+        line-height: 1.05;
       }
       select {
         appearance: none;
@@ -191,45 +224,64 @@
         color: var(--muted);
       }
       .group {
-        margin-bottom: 22px;
+        margin-bottom: 18px;
       }
       .group-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         border-bottom: 1px solid var(--border);
         padding-bottom: 6px;
       }
       .group-title {
         font-weight: 700;
-        letter-spacing: 0.2px;
+        letter-spacing: 0.1px;
       }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 14px;
-      }
-      .card {
-        background: var(--card);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--border);
-        padding: 14px;
+      .list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
       }
-      .title-row {
+      .task-row {
         display: flex;
-        justify-content: space-between;
+        gap: 10px;
+        align-items: stretch;
+        padding: 10px 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        transition: border-color 0.12s ease, transform 0.12s ease;
+      }
+      .task-row:hover {
+        border-color: var(--accent-border);
+        transform: translateY(-1px);
+      }
+      .task-accent {
+        width: 6px;
+        border-radius: 999px;
+        background: var(--accent);
+        opacity: 0.8;
+        flex-shrink: 0;
+      }
+      .task-main {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+      }
+      .task-header {
+        display: flex;
         align-items: flex-start;
-        gap: 12px;
+        justify-content: space-between;
+        gap: 8px;
       }
       .task-title {
-        font-weight: 800;
-        font-size: 16px;
+        font-weight: 750;
+        font-size: 15px;
         line-height: 1.4;
+        margin: 0;
       }
       .pill {
         display: inline-flex;
@@ -251,7 +303,7 @@
         flex-wrap: wrap;
         gap: 8px;
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12px;
       }
       .chips {
         display: flex;
@@ -262,12 +314,19 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 6px 8px;
+        padding: 5px 7px;
         border-radius: 999px;
         background: var(--surface-2);
         color: var(--text);
-        font-size: 12px;
+        font-size: 11px;
         border: 1px solid var(--border);
+      }
+      .task-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
       }
       .section {
         border-top: 1px solid var(--border);
@@ -332,6 +391,22 @@
         flex-direction: column;
         gap: 6px;
       }
+      .subtask-preview {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .subtask-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        border-radius: 9px;
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        font-size: 11px;
+      }
       .subtask,
       .attachment {
         display: flex;
@@ -388,13 +463,6 @@
       }
       .muted {
         color: var(--muted);
-      }
-      .card-footer {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
       }
       .actions {
         display: flex;
@@ -486,40 +554,42 @@
     </style>
   </head>
   <body>
-    <div class="topbar">
-      <h1>
-        Archived Tasks Viewer
-        <span class="badge">Read-only</span>
-      </h1>
-      <div class="header-actions">
-        <button id="reload-btn" class="primary btn-sm" type="button">Reload</button>
-        <span id="count" class="muted"></span>
-        <button id="theme-toggle" class="theme-btn" type="button" aria-label="Toggle theme"></button>
+    <div class="page">
+      <div class="topbar">
+        <h1>
+          Archived Tasks Viewer
+          <span class="badge">Read-only</span>
+        </h1>
+        <div class="header-actions">
+          <button id="reload-btn" class="primary btn-sm" type="button">Reload</button>
+          <span id="count" class="muted"></span>
+          <button id="theme-toggle" class="theme-btn" type="button" aria-label="Toggle theme"></button>
+        </div>
       </div>
+      <div class="toolbar">
+        <div class="field">
+          <span>Group by</span>
+          <div class="segmented" data-field="group">
+            <button type="button" class="seg-btn" data-value="date">Completion date</button>
+            <button type="button" class="seg-btn" data-value="tag">Tag</button>
+            <button type="button" class="seg-btn" data-value="project">Project</button>
+          </div>
+        </div>
+        <div class="field">
+          <span>View mode</span>
+          <div class="segmented" data-field="view">
+            <button type="button" class="seg-btn" data-value="parent">Parent tasks (tree)</button>
+            <button type="button" class="seg-btn" data-value="flat">All tasks (flat)</button>
+          </div>
+        </div>
+        <div class="field">
+          <span>Filter</span>
+          <input id="filter-input" type="search" placeholder="Title, notes, tag, project, subtask..." />
+        </div>
+      </div>
+      <div id="status" class="status">Loading archived tasks...</div>
+      <div id="content"></div>
     </div>
-    <div class="toolbar">
-      <div class="field">
-        <span>Group by</span>
-        <select id="group-select">
-          <option value="date">Completion date</option>
-          <option value="tag">Tag</option>
-          <option value="project">Project</option>
-        </select>
-      </div>
-      <div class="field">
-        <span>View mode</span>
-        <select id="view-mode">
-          <option value="parent">Parent tasks (tree)</option>
-          <option value="flat">All tasks (flat)</option>
-        </select>
-      </div>
-      <div class="field">
-        <span>Filter</span>
-        <input id="filter-input" type="search" placeholder="Title, notes, tag, project, subtask..." />
-      </div>
-    </div>
-    <div id="status" class="status">Loading archived tasks...</div>
-    <div id="content"></div>
     <div id="modal-root"></div>
 
     <script>
@@ -544,12 +614,12 @@
 
       const elStatus = document.getElementById('status');
       const elContent = document.getElementById('content');
-      const elGroup = document.getElementById('group-select');
       const elCount = document.getElementById('count');
       const elReload = document.getElementById('reload-btn');
       const elFilter = document.getElementById('filter-input');
       const elModalRoot = document.getElementById('modal-root');
-      const elViewMode = document.getElementById('view-mode');
+      const elGroupSeg = document.querySelector('.segmented[data-field="group"]');
+      const elViewSeg = document.querySelector('.segmented[data-field="view"]');
       const elThemeToggle = document.getElementById('theme-toggle');
 
       function prefersDark() {
@@ -576,51 +646,94 @@
         }
       }
 
+      const THEMES = {
+        light: {
+          bg: '#f8f8f7',
+          card: '#ffffff',
+          muted: '#4b5563',
+          border: 'rgba(0, 0, 0, 0.08)',
+          accent: '#3b82f6',
+          shadow: '0 6px 18px rgba(0, 0, 0, 0.08)',
+          text: '#1f2937',
+          surface1: '#f3f4f6',
+          surface2: '#eef1f7',
+          grad1: 'transparent',
+          grad2: 'transparent',
+          accentBg: 'rgba(59, 130, 246, 0.12)',
+          accentBorder: 'rgba(59, 130, 246, 0.28)',
+          accentText: '#1d4ed8',
+          focusOutline: 'rgba(59, 130, 246, 0.35)',
+          focusShadow: '0 0 0 3px rgba(59, 130, 246, 0.12)',
+          backdrop: 'rgba(0, 0, 0, 0.55)',
+        },
+        dark: {
+          bg: '#131314',
+          card: '#242424',
+          muted: '#cbd5e1',
+          border: 'rgba(255, 255, 255, 0.08)',
+          accent: '#8ab4ff',
+          shadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
+          text: '#e8edf7',
+          surface1: '#1d1f24',
+          surface2: '#272b32',
+          grad1: 'transparent',
+          grad2: 'transparent',
+          accentBg: 'rgba(138, 180, 255, 0.16)',
+          accentBorder: 'rgba(138, 180, 255, 0.32)',
+          accentText: '#d8e6ff',
+          focusOutline: 'rgba(138, 180, 255, 0.38)',
+          focusShadow: '0 0 0 3px rgba(138, 180, 255, 0.18)',
+          backdrop: 'rgba(0, 0, 0, 0.62)',
+        },
+      };
+
       const applyTheme = (mode) => {
         const theme = mode === 'light' ? 'light' : 'dark';
+        const vars = THEMES[theme];
         const root = document.documentElement.style;
-        if (theme === 'light') {
-          root.setProperty('--bg', '#f6f7fb');
-          root.setProperty('--card', '#ffffff');
-          root.setProperty('--muted', '#475569');
-          root.setProperty('--border', '#d6dde8');
-          root.setProperty('--accent', '#2563eb');
-          root.setProperty('--shadow', '0 12px 30px rgba(15, 23, 42, 0.12)');
-          root.setProperty('--text', '#0f172a');
-          root.setProperty('--surface-1', '#f3f6fd');
-          root.setProperty('--surface-2', '#edf2ff');
-          root.setProperty('--grad1', 'rgba(37, 99, 235, 0.10)');
-          root.setProperty('--grad2', 'rgba(14, 165, 233, 0.08)');
-          root.setProperty('--accent-bg', 'rgba(37, 99, 235, 0.10)');
-          root.setProperty('--accent-border', 'rgba(37, 99, 235, 0.24)');
-          root.setProperty('--accent-text', '#1d4ed8');
-          root.setProperty('--focus-outline', 'rgba(37, 99, 235, 0.35)');
-          root.setProperty('--focus-shadow', '0 0 0 3px rgba(37, 99, 235, 0.14)');
-          root.setProperty('--backdrop', 'rgba(15, 23, 42, 0.42)');
-        } else {
-          root.setProperty('--bg', '#181b22');
-          root.setProperty('--card', '#212631');
-          root.setProperty('--muted', '#a6b2c5');
-          root.setProperty('--border', '#2f3542');
-          root.setProperty('--accent', '#8ab4ff');
-          root.setProperty('--shadow', '0 14px 34px rgba(0, 0, 0, 0.24)');
-          root.setProperty('--text', '#e8edf7');
-          root.setProperty('--surface-1', '#1d222c');
-          root.setProperty('--surface-2', '#232a35');
-          root.setProperty('--grad1', 'rgba(138, 180, 255, 0.10)');
-          root.setProperty('--grad2', 'rgba(129, 230, 217, 0.08)');
-          root.setProperty('--accent-bg', 'rgba(138, 180, 255, 0.16)');
-          root.setProperty('--accent-border', 'rgba(138, 180, 255, 0.32)');
-          root.setProperty('--accent-text', '#d8e6ff');
-          root.setProperty('--focus-outline', 'rgba(138, 180, 255, 0.42)');
-          root.setProperty('--focus-shadow', '0 0 0 3px rgba(138, 180, 255, 0.16)');
-          root.setProperty('--backdrop', 'rgba(0, 0, 0, 0.58)');
-        }
+        Object.entries({
+          '--bg': vars.bg,
+          '--card': vars.card,
+          '--muted': vars.muted,
+          '--border': vars.border,
+          '--accent': vars.accent,
+          '--shadow': vars.shadow,
+          '--text': vars.text,
+          '--surface-1': vars.surface1,
+          '--surface-2': vars.surface2,
+          '--grad1': vars.grad1,
+          '--grad2': vars.grad2,
+          '--accent-bg': vars.accentBg,
+          '--accent-border': vars.accentBorder,
+          '--accent-text': vars.accentText,
+          '--focus-outline': vars.focusOutline,
+          '--focus-shadow': vars.focusShadow,
+          '--backdrop': vars.backdrop,
+        }).forEach(([k, v]) => root.setProperty(k, v));
+
         elThemeToggle.dataset.theme = theme;
         elThemeToggle.innerHTML =
           theme === 'dark'
             ? `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z\"/></svg><span class=\"theme-label\">Dark</span>`
             : `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"M4.93 4.93l1.41 1.41\"/><path d=\"M17.66 17.66l1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"M4.93 19.07l1.41-1.41\"/><path d=\"M17.66 6.34l1.41-1.41\"/></svg><span class=\"theme-label\">Light</span>`;
+      };
+
+      const setSegmentedValue = (container, value) => {
+        if (!container) return;
+        container.querySelectorAll('.seg-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.value === value);
+        });
+      };
+
+      const wireSegmented = (container, onChange) => {
+        if (!container) return;
+        container.querySelectorAll('.seg-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.value;
+            setSegmentedValue(container, val);
+            onChange(val);
+          });
+        });
       };
 
       const formatDate = (ts) => {
@@ -791,12 +904,12 @@
           header.appendChild(count);
           section.appendChild(header);
 
-          const grid = document.createElement('div');
-          grid.className = 'grid';
+          const list = document.createElement('div');
+          list.className = 'list';
           group.tasks.forEach((task) =>
-            grid.appendChild(renderTask(task, state.viewMode === 'parent')),
+            list.appendChild(renderTask(task, state.viewMode === 'parent')),
           );
-          section.appendChild(grid);
+          section.appendChild(list);
 
           frag.appendChild(section);
         });
@@ -808,19 +921,30 @@
 
       function renderTask(task, isTree) {
         const card = document.createElement('article');
-        card.className = 'card';
+        card.className = 'task-row';
 
-        const titleRow = document.createElement('div');
-        titleRow.className = 'title-row';
-        const title = document.createElement('div');
+        const accent = document.createElement('div');
+        accent.className = 'task-accent';
+        card.appendChild(accent);
+
+        const main = document.createElement('div');
+        main.className = 'task-main';
+        card.appendChild(main);
+
+        const header = document.createElement('div');
+        header.className = 'task-header';
+        const title = document.createElement('p');
         title.className = 'task-title';
         title.textContent = task.title || '(untitled)';
+        const statusWrap = document.createElement('div');
+        statusWrap.className = 'row-actions';
         const doneOn = document.createElement('span');
         doneOn.className = 'pill accent';
-        doneOn.textContent = `Done: ${formatDate(task.doneOn)}`;
-        titleRow.appendChild(title);
-        titleRow.appendChild(doneOn);
-        card.appendChild(titleRow);
+        doneOn.textContent = formatDate(task.doneOn);
+        statusWrap.appendChild(doneOn);
+        header.appendChild(title);
+        header.appendChild(statusWrap);
+        main.appendChild(header);
 
         const meta = document.createElement('div');
         meta.className = 'meta';
@@ -828,7 +952,7 @@
           <span>Project: ${task.projectId ? state.projects[task.projectId] || unassigned : unassigned}</span>
           <span>Submitted: ${formatDate(task.created)}</span>
         `;
-        card.appendChild(meta);
+        main.appendChild(meta);
 
         const tags = formatTags(task);
         if (tags.length) {
@@ -840,21 +964,21 @@
             chip.textContent = t;
             tagWrap.appendChild(chip);
           });
-          card.appendChild(tagWrap);
+          main.appendChild(tagWrap);
         }
 
         // Brief subtask preview: title + done date
         const previewSubs = isTree ? task.children || [] : task.subTasks || [];
         if (previewSubs.length) {
           const box = document.createElement('div');
-          box.className = 'section subtasks';
-          const label = document.createElement('div');
-          label.className = 'section-title';
+          box.className = 'subtask-preview';
+          const label = document.createElement('span');
+          label.className = 'muted';
           label.textContent = `Subtasks (${previewSubs.length})`;
           box.appendChild(label);
-          previewSubs.slice(0, 4).forEach((st) => {
-            const row = document.createElement('div');
-            row.className = 'subtask';
+          previewSubs.slice(0, 2).forEach((st) => {
+            const row = document.createElement('span');
+            row.className = 'subtask-pill';
             const name = document.createElement('span');
             name.className = 'subtask-title';
             name.textContent = st.title || '(untitled)';
@@ -865,17 +989,24 @@
             row.appendChild(done);
             box.appendChild(row);
           });
-          if (previewSubs.length > 4) {
-            const more = document.createElement('div');
+          if (previewSubs.length > 2) {
+            const more = document.createElement('span');
             more.className = 'muted';
-            more.textContent = `+${previewSubs.length - 4} more...`;
+            more.textContent = `+${previewSubs.length - 2} more`;
             box.appendChild(more);
           }
-          card.appendChild(box);
+          main.appendChild(box);
         }
 
         const footer = document.createElement('div');
-        footer.className = 'card-footer';
+        footer.className = 'task-footer';
+        const footerMeta = document.createElement('div');
+        footerMeta.className = 'meta tight';
+        footerMeta.innerHTML = `
+          <span>Done: ${formatDate(task.doneOn)}</span>
+          <span>Time spent: ${formatMs(task.timeSpent)}</span>
+          <span>Estimate: ${formatMs(task.timeEstimate)}</span>
+        `;
         const actions = document.createElement('div');
         actions.className = 'actions tight';
 
@@ -885,8 +1016,9 @@
         viewBtn.addEventListener('click', () => openDetail(task, isTree));
 
         actions.appendChild(viewBtn);
+        footer.appendChild(footerMeta);
         footer.appendChild(actions);
-        card.appendChild(footer);
+        main.appendChild(footer);
 
         return card;
       }
@@ -1088,20 +1220,10 @@
         }
       }
 
-      elGroup.addEventListener('change', (e) => {
-        state.group = e.target.value;
-        render();
-      });
-
       elReload.addEventListener('click', () => loadData());
 
       elFilter.addEventListener('input', (e) => {
         state.filter = e.target.value.trim();
-        render();
-      });
-
-      elViewMode.addEventListener('change', (e) => {
-        state.viewMode = e.target.value;
         render();
       });
 
@@ -1110,6 +1232,19 @@
         applyTheme(state.theme);
         saveTheme(state.theme);
       });
+
+      wireSegmented(elGroupSeg, (val) => {
+        state.group = val;
+        render();
+      });
+
+      wireSegmented(elViewSeg, (val) => {
+        state.viewMode = val;
+        render();
+      });
+
+      setSegmentedValue(elGroupSeg, state.group);
+      setSegmentedValue(elViewSeg, state.viewMode);
 
       // kick off
       state.theme = getSavedTheme() || (prefersDark() ? 'dark' : 'light');
