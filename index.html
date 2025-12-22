@@ -85,7 +85,7 @@
         background: var(--surface-1);
         border: 1px solid var(--border);
         border-radius: 999px;
-        padding: 4px;
+        padding: 4px 8px;
         height: 38px;
       }
       .seg-btn {
@@ -98,6 +98,7 @@
         height: 30px;
         cursor: pointer;
         transition: all 0.12s ease;
+        white-space: nowrap;
       }
       .seg-btn.active {
         background: var(--accent-bg);
@@ -122,8 +123,12 @@
         gap: 4px;
         color: var(--muted);
         font-size: 12px;
-        min-width: 180px;
+        min-width: 220px;
         flex: 1;
+      }
+      .segmented-field {
+        min-width: 260px;
+        flex: 0 0 auto;
       }
       .field-inline {
         display: inline-flex;
@@ -668,7 +673,7 @@
             <button type="button" class="seg-btn" data-value="calendar">Calendar</button>
           </div>
         </div>
-        <div class="field hide-when-calendar">
+        <div class="field segmented-field hide-when-calendar">
           <span>Group by</span>
           <div class="segmented" data-field="group">
             <button type="button" class="seg-btn" data-value="date">Completion date</button>
@@ -676,7 +681,7 @@
             <button type="button" class="seg-btn" data-value="project">Project</button>
           </div>
         </div>
-        <div class="field hide-when-calendar">
+        <div class="field segmented-field hide-when-calendar">
           <span>View mode</span>
           <div class="segmented" data-field="view">
             <button type="button" class="seg-btn" data-value="parent">Parent tasks (tree)</button>
