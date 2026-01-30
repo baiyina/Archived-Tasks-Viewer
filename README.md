@@ -5,10 +5,10 @@
 ## English
 Read-only Super Productivity plugin to browse archived tasks with a clean, iframe-based UI.
 
-### Compatibility
+## Compatibility
 - Super Productivity `>= 16.0.0`
 
-### Features
+## Features
 - Read-only access to archived tasks (`PluginAPI.getArchivedTasks`)
 - Screens: `Tasks` (list) and `Calendar` (week/month)
 - Tasks screen: grouping by completion date / tag / project; view as parent task tree or flat list
@@ -18,26 +18,39 @@ Read-only Super Productivity plugin to browse archived tasks with a clean, ifram
 - Details modal: project, tags, done date, created, time spent/estimate, notes, subtasks, attachments
 - Light/Dark theme toggle (auto-detect on first load)
 
-### Install & Use
-1) Zip this folder (keep `manifest.json`, `plugin.js`, `index.html` at the zip root):
-   ```powershell
-   Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
-   ```
-2) Download from GitHub Releases (recommended): [Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) → `archived-viewer-plugin-<version>.zip`, then in Super Productivity go to `Settings -> Plugins -> Upload plugin` and enable it.
-   - Or, use the local zip you just built.
-3) Open sidebar `Archived tasks`:
-   - Screen: `Tasks` (list) or `Calendar` (week/month)
-   - If `Tasks` screen: switch grouping (date/tag/project) and view (parent tree/flat)
-   - Filter text; click `Reload` to refresh
-   - Click `View details` for the full modal
+## Install & Use
+### 1) Get the Plugin
+* **Option A: Download (Recommended):** Download the latest from GitHub Releases: [Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) 
+* **Option B: Build Locally:** If you are working from the source code, zip the folder (ensure `manifest.json`, `plugin.js`, and `index.html` are at the zip root):
+    ```powershell
+    Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
+    ```
+### 2. Install to Super Productivity
+Once you have the `.zip` file:
+1.  Open **Super Productivity**.
+2.  Navigate to `Settings` > `Plugins`.
+3.  Click **Upload plugin** and select your zip file.
+4.  Ensure the plugin is toggled to **Enabled**.
 
-### Permissions
+---
+
+### 3. How to Use
+Access your archives via the **Archived tasks** entry in the sidebar:
+
+* **Views:** Toggle between `Tasks` (list) or `Calendar` (week/month) screens.
+* **Organization:** In the `Tasks` screen, you can switch groupings (date/tag/project) and views (parent tree/flat).
+* **Controls:** Use the filter text box to find specific items or click **Reload** to refresh the data.
+* **Details:** Click **View details** on any task to open the full information modal.
+
+
+
+## Permissions
 - `PluginAPI.getArchivedTasks`
 - `PluginAPI.getAllProjects`
 - `PluginAPI.getAllTags`
 - `PluginAPI.showSnack`
 
-### Notes
+## Notes
 - Strictly read-only; never edits tasks.
 - Tag grouping uses the first tag as the bucket key; all tags remain visible on cards.
 - Sample import file: `sample-import.json` (Super Productivity backup format) for quick testing.
