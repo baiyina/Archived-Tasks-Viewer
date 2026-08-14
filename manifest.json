@@ -8,6 +8,7 @@
   "hooks": [],
   "permissions": [
     "PluginAPI.getArchivedTasks",
+    "PluginAPI.restoreArchivedTask",
     "PluginAPI.getAllProjects",
     "PluginAPI.getAllTags",
     "PluginAPI.showSnack"
