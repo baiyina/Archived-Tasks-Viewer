@@ -1,0 +1,16 @@
+{
+  "name": "archived-tasks-viewer",
+  "version": "0.5.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "npm run build && playwright test"
+  },
+  "dependencies": {
+    "dompurify": "3.4.15",
+    "marked": "18.0.13"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

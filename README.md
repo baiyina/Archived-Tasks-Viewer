@@ -3,85 +3,81 @@
 [English](#english) | [中文](#中文)
 
 ## English
-Read-only Super Productivity plugin to browse archived tasks with a clean, iframe-based UI.
+
+Read-only plugin to browse archived tasks, read Markdown notes and inspect complete task families.
 
 ### Compatibility
-- Super Productivity `>= 16.0.0`
 
-### Features
-- Read-only access to archived tasks (`PluginAPI.getArchivedTasks`)
-- Screens: `Tasks` (list) and `Calendar` (week/month)
-- Tasks screen: grouping by completion date / tag / project; view as parent task tree or flat list
-- Filter by title/notes/tag/project
-- Per-card info: title, done date, project, tags, created/submit date
-- Subtask preview: title + done date (full details in modal)
-- Details modal: project, tags, done date, created, time spent/estimate, notes, subtasks, attachments
-- Light/Dark theme toggle (auto-detect on first load)
+- Browsing: Super Productivity **16.0.0 or newer**.
+- No host modifications are required. The plugin only uses existing read APIs.
+- Archive restoration ([issue #5](https://github.com/baiyina/Archived-Tasks-Viewer/issues/5)) is not implemented: the inspected host plugin API does not expose it. This release does not add an unsupported permission or claim to resolve that issue.
 
-### Install & Use
-1) Zip this folder (keep `manifest.json`, `plugin.js`, `index.html` at the zip root):
-   ```powershell
-   Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
-   ```
-2) Download from GitHub Releases (recommended): [Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) → `archived-viewer-plugin-<version>.zip`, then in Super Productivity go to `Settings -> Plugins -> Upload plugin` and enable it.
-   - Or, use the local zip you just built.
-3) Open sidebar `Archived tasks`:
-   - Screen: `Tasks` (list) or `Calendar` (week/month)
-   - If `Tasks` screen: switch grouping (date/tag/project) and view (parent tree/flat)
-   - Filter text; click `Reload` to refresh
-   - Click `View details` for the full modal
+### Install
+
+1. Choose **one** source:
+   - **Download (recommended):** obtain the plugin ZIP from [GitHub Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases).
+   - **Build locally:** with Node.js 20.19+ and PowerShell, run:
+     ```powershell
+     npm ci
+     ./scripts/package.ps1
+     ```
+     Only index.html, manifest.json, plugin.js and THIRD_PARTY_NOTICES.md from dist/ are included at the ZIP root. **Never zip the whole working directory**, which may contain personal backups.
+2. In Super Productivity, open **Settings → Plugins → Upload plugin**, upload the ZIP and enable it.
+3. Open **Archived tasks** from the sidebar.
+
+### Use
+
+- **Tasks:** group by completion date, first tag or project; switch parent tree/flat view. All tags remain visible.
+- **Calendar:** switch week/month and use Prev, Today and Next.
+- **Search:** filter title, notes, tags and project. Details show the complete family, even when search hides some children.
+- **Subtasks:** show completion counts and Done/Open status. Related active parents and siblings are labelled as context in parent view. Unrelated active tasks are excluded; flat/calendar views list archived tasks only.
+- **Notes:** offline Markdown headings, lists, checkboxes, tables, links and code blocks. Unsafe HTML is removed, embedded images are omitted, and only HTTP/HTTPS/mailto links are clickable. Unsupported attachment paths stay visible as text.
+- This plugin does not modify, restore or permanently delete tasks.
 
 ### Permissions
-- `PluginAPI.getArchivedTasks`
-- `PluginAPI.getAllProjects`
-- `PluginAPI.getAllTags`
-- `PluginAPI.showSnack`
 
-### Notes
-- Strictly read-only; never edits tasks.
-- Tag grouping uses the first tag as the bucket key; all tags remain visible on cards.
-- Sample import file: `sample-import.json` (Super Productivity backup format) for quick testing.
-- If this plugin helps you, consider leaving a ⭐ on GitHub — it tells me it’s useful. I’ll keep polishing it and follow up in discussions when time allows.
+PluginAPI.getArchivedTasks, PluginAPI.getTasks (related active context), PluginAPI.getAllProjects, PluginAPI.getAllTags, PluginAPI.showSnack.
 
----
+### Development
+
+Edit src/index.html; **npm run build** generates the self-contained root index.html and dist/. Dependencies are inlined for the host's blob iframe. **npm test** runs browser regressions using Microsoft Edge; set PLAYWRIGHT_CHANNEL=chrome for Chrome. npm ci uses pinned dependencies in package-lock.json. THIRD_PARTY_NOTICES.md contains dependency licenses. Personal JSON backups are never packaged or used as test fixtures.
 
 ## 中文
-适用于 Super Productivity 的只读插件：在 iframe 界面浏览归档任务，支持分组、过滤和详情弹窗。
+
+只读插件：浏览归档任务，阅读 Markdown 备注，查看完整父子任务关系。
 
 ### 兼容性
-- Super Productivity `>= 16.0.0`
 
-### 功能
-- 只读获取归档任务（`PluginAPI.getArchivedTasks`）
-- 两个界面：`Tasks`（列表）与 `Calendar`（周/月）
-- Tasks 界面：按完成日期/标签/项目分组，视图可选父任务树或平铺
-- 过滤：标题、备注、标签、项目
-- 卡片展示：标题、完成日期、项目、标签、创建/提交时间
-- 子任务简览：标题 + 完成时间（更多信息在详情弹窗查看）
-- 详情弹窗：项目、标签、完成时间、创建时间、耗时/预估、备注、子任务、附件
-- 明暗主题切换（首次自动跟随系统）
+- 浏览功能：Super Productivity **16.0.0 及以上**。
+- 不需要修改主体，仅使用现有读取接口。
+- 归档恢复（[Issue #5](https://github.com/baiyina/Archived-Tasks-Viewer/issues/5)）尚未实现：已检查的宿主插件 API 没有开放此能力。本版不添加不存在的权限，也不将该问题标为已解决。
 
-### 安装与使用
-1) 在本目录生成 zip（确保 `manifest.json`、`plugin.js`、`index.html` 位于压缩包根目录）：
-   ```powershell
-   Compress-Archive -Path * -DestinationPath archived-viewer-plugin.zip -Force
-   ```
-2) 从 GitHub Releases 下载（推荐）：[Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) 中获取 `archived-viewer-plugin-<version>.zip`；然后在 Super Productivity 里打开 `Settings -> Plugins -> Upload plugin` 上传并启用。
-   - 或使用刚才本地打包的 zip。
-3) 打开侧边栏 `Archived tasks`：
-   - Screen：`Tasks`（列表）或 `Calendar`（周/月）
-   - 在 `Tasks` 下切换分组（日期/标签/项目）与视图（父任务树/平铺）
-   - 文本过滤，点击 `Reload` 重新拉取
-   - 点击 `View details` 打开完整详情
+### 安装
+
+1. **任选一种**获取方式：
+   - **下载（推荐）**：从 [GitHub Releases](https://github.com/baiyina/Archived-Tasks-Viewer/releases) 获取插件 ZIP。
+   - **源码构建**：使用 Node.js 20.19+ 和 PowerShell：
+     ```powershell
+     npm ci
+     ./scripts/package.ps1
+     ```
+     仅将 dist/ 中的 index.html、manifest.json、plugin.js、THIRD_PARTY_NOTICES.md 放入压缩包根目录。**不要打包整个工作目录**，以免混入个人备份。
+2. 在 Super Productivity 打开 **Settings → Plugins → Upload plugin**，上传 ZIP 并启用。
+3. 从侧边栏打开 **Archived tasks**。
+
+### 使用
+
+- **Tasks 列表**：按完成日期、首个标签或项目分组，切换父任务树/平铺，卡片仍显示全部标签。
+- **Calendar 日历**：切换周/月，通过 Prev、Today、Next 导航。
+- **搜索**：筛选标题、备注、标签和项目，详情始终显示完整关联任务，不受列表搜索裁剪影响。
+- **子任务**：显示完成数量及 Done/Open 状态。父任务视图补充相关活动父任务、兄弟任务并标为上下文；不混入无关活动任务，平铺和日历只列归档任务。
+- **备注**：离线支持 Markdown 标题、列表、复选框、表格、链接、代码块。过滤不安全 HTML，不加载内嵌图片，只允许 HTTP/HTTPS/mailto 链接；不能安全打开的附件路径保留为文本。
+- 本插件不修改、恢复或永久删除任务。
 
 ### 权限
-- `PluginAPI.getArchivedTasks`
-- `PluginAPI.getAllProjects`
-- `PluginAPI.getAllTags`
-- `PluginAPI.showSnack`
 
-### 备注
-- 完全只读，不会修改任务数据。
-- 标签分组使用首个标签作为分组键，卡片仍会展示所有标签。
-- 提供测试用例 `sample-import.json`（Super Productivity 备份格式），可快速验证。
-- 如果这个插件对你有帮助，欢迎在 GitHub 点亮一个 ⭐。这会让我知道它有价值，也便于我抽空继续优化并关注讨论区。
+PluginAPI.getArchivedTasks、PluginAPI.getTasks（关联活动任务）、PluginAPI.getAllProjects、PluginAPI.getAllTags、PluginAPI.showSnack。
+
+### 开发
+
+修改 src/index.html；**npm run build** 生成可独立运行的根目录 index.html 和 dist/，依赖内联以适配宿主 blob iframe。**npm test** 使用 Microsoft Edge 执行浏览器回归，设置 PLAYWRIGHT_CHANNEL=chrome 可改用 Chrome。npm ci 按 package-lock.json 安装固定版本依赖，许可见 THIRD_PARTY_NOTICES.md。个人 JSON 备份不会打包或用作测试数据。
