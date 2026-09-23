@@ -25,3 +25,18 @@ Final plugin-only build: 6 Playwright browser tests passed in Edge (safe Markdow
 
 ## Notes
 Keep existing untracked JSON files private and unchanged.
+
+## Bugfix session — 2026-09-23
+
+- Goal: fix reported plugin bugs, limited to this repository. v0.5.0 was already published; the publication steps above are historical.
+- Fixed #9: original index.html was 130,772 bytes versus the host limit of 102,400. ESM bundling, minification, private theme-variable renaming and removal of unused CSS reduce it to 102,047 bytes. Build fails before updating release files if oversized. Only 353 bytes of headroom remain, so preserve the size guard.
+- #8: existing safe Markdown remains functional, including Chinese text and tables in an offline sandboxed blob iframe. #5 restoration is still unsupported; no host changes or delete/restore behavior added.
+- Prepared local v0.5.1 and archived-viewer-plugin-0.5.1.zip. Not committed, pushed or released. ZIP has only index.html, manifest.json, plugin.js, THIRD_PARTY_NOTICES.md; personal JSON files untouched.
+- Verification: all 9 Edge tests passed; ZIP entry sizes/allowlist and git diff --check passed; mobile screenshot reviewed. Not installed in a live host on macOS/Android.
+- Key files: scripts/build.cjs, src/index.html, tests/viewer.spec.cjs, package.json/lock, manifest.json, CHANGELOG.md, README.md and generated index.html.
+- Next: user can install the local ZIP; publish v0.5.1 and update issues if requested.
+
+## Release preparation — 2026-09-24
+
+- User authorized uploading v0.5.1. Remote main matches the v0.5.0 base; committing and publishing only this plugin's tracked changes and verified four-file ZIP.
+- Existing verification remains valid: 9 passing tests, 102,047-byte page, ZIP inspected. No functional changes since those checks. Final publication result is recorded in the parent workspace HANDOFF.md.

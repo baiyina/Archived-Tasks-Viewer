@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.1
+
+- Fix installation failure caused by index.html exceeding the host's 100 KiB uncompressed limit (#9). Bundle only used library exports, minify HTML/CSS/JavaScript and remove obsolete styles; reject oversized builds before producing release files.
+- Preserve offline Markdown rendering and HTML sanitization (#8). No host changes required.
+- 验证并修复安装页面超过 100 KiB 限制的问题（#9），保留离线 Markdown 渲染及安全过滤（#8）；构建时自动检查未压缩文件字节数。
+- Validation: 9 Edge tests, including the size limit, sandboxed blob iframe, Markdown tables/Chinese text, sanitization, theme switching and mobile layout.
+
 ## v0.5.0
 
 ### English

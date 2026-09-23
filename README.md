@@ -40,7 +40,7 @@ PluginAPI.getArchivedTasks, PluginAPI.getTasks (related active context), PluginA
 
 ### Development
 
-Edit src/index.html; **npm run build** generates the self-contained root index.html and dist/. Dependencies are inlined for the host's blob iframe. **npm test** runs browser regressions using Microsoft Edge; set PLAYWRIGHT_CHANNEL=chrome for Chrome. npm ci uses pinned dependencies in package-lock.json. THIRD_PARTY_NOTICES.md contains dependency licenses. Personal JSON backups are never packaged or used as test fixtures.
+Edit src/index.html; **npm run build** generates the minified, self-contained root index.html and dist/. Dependencies are inlined for the host's blob iframe. The build rejects index.html larger than 102,400 uncompressed UTF-8 bytes (ZIP size does not determine installability). **npm test** runs browser regressions using Microsoft Edge; set PLAYWRIGHT_CHANNEL=chrome for Chrome. npm ci uses pinned dependencies in package-lock.json. THIRD_PARTY_NOTICES.md contains dependency licenses. Personal JSON backups are never packaged or used as test fixtures.
 
 ## 中文
 
@@ -80,4 +80,4 @@ PluginAPI.getArchivedTasks、PluginAPI.getTasks（关联活动任务）、Plugin
 
 ### 开发
 
-修改 src/index.html；**npm run build** 生成可独立运行的根目录 index.html 和 dist/，依赖内联以适配宿主 blob iframe。**npm test** 使用 Microsoft Edge 执行浏览器回归，设置 PLAYWRIGHT_CHANNEL=chrome 可改用 Chrome。npm ci 按 package-lock.json 安装固定版本依赖，许可见 THIRD_PARTY_NOTICES.md。个人 JSON 备份不会打包或用作测试数据。
+修改 src/index.html；**npm run build** 生成压缩后可独立运行的根目录 index.html 和 dist/，依赖内联以适配宿主 blob iframe。构建会拒绝超过 102,400 个未压缩 UTF-8 字节的 index.html（不能只看 ZIP 大小）。**npm test** 使用 Microsoft Edge 执行浏览器回归，设置 PLAYWRIGHT_CHANNEL=chrome 可改用 Chrome。npm ci 按 package-lock.json 安装固定版本依赖，许可见 THIRD_PARTY_NOTICES.md。个人 JSON 备份不会打包或用作测试数据。

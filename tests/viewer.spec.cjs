@@ -5,6 +5,40 @@ const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 const parent = { id: 'p', title: '<img src=x onerror="window.injected=1"> Parent', projectId: 'project', tagIds: [], subTaskIds: ['done', 'open'], isDone: true, notes: '# Heading\n\n**Bold** and [safe](https://example.com)\n\n- [x] Complete\n- [ ] Pending\n\n```js\nconst n = 1;\n```\n\n<script>window.injected=1</script>\n\n[bad](javascript:alert(1))', attachments: [{ title: 'bad attachment', path: 'javascript:alert(1)' }, { title: 'good attachment', path: 'https://example.com/file' }] };
 const children = [{ id: 'done', parentId: 'p', title: 'Completed child', isDone: true, subTaskIds: [] }, { id: 'open', parentId: 'p', title: 'Pending child', isDone: false, subTaskIds: [] }];
 
+test('release page fits the host uncompressed byte limit', () => {
+  expect(Buffer.byteLength(html, 'utf8')).toBeLessThanOrEqual(100 * 1024);
+  expect(fs.readFileSync(path.join(__dirname, '../dist/index.html'), 'utf8')).toBe(html);
+});
+
+test('bundled Markdown works offline in a sandboxed blob iframe', async ({ page }) => {
+  const requests = [];
+  page.on('request', (request) => { if (/^https?:/.test(request.url())) requests.push(request.url()); });
+  await page.route('**/*', (route) => route.abort());
+  await page.evaluate((html) => {
+    const mock = `<script>window.PluginAPI = {
+      getArchivedTasks: async () => [{id: 'blob', title: 'Blob task', notes: '# 中文备注\\n\\n| Name | Value |\\n| --- | --- |\\n| Test | 42 |', subTaskIds: []}],
+      getTasks: async () => [], getAllProjects: async () => [], getAllTags: async () => []
+    };<\/script>`;
+    const frame = document.createElement('iframe');
+    frame.setAttribute('sandbox', 'allow-scripts');
+    frame.src = URL.createObjectURL(new Blob([html.replace('<head>', '<head>' + mock)], {type: 'text/html'}));
+    document.body.append(frame);
+  }, html);
+  const frame = page.frameLocator('iframe');
+  await frame.getByRole('button', {name: 'View details'}).click();
+  await expect(frame.locator('.notes h1')).toHaveText('中文备注');
+  await expect(frame.locator('.notes td').last()).toHaveText('42');
+  expect(requests).toEqual([]);
+});
+
+test('minified theme variables still switch the visible theme', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await boot(page);
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(248, 248, 247)');
+  await page.locator('#theme-toggle').click();
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(19, 19, 20)');
+});
+
 async function boot(page, options = {}) {
   await page.route('**/*', (route) => route.abort());
   await page.addInitScript(() => {});

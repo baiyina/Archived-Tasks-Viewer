@@ -2,7 +2,7 @@
   "name": "Archived Tasks Viewer",
   "id": "archived-tasks-viewer",
   "manifestVersion": 1,
-  "version": "0.5.0",
+  "version": "0.5.1",
   "minSupVersion": "16.0.0",
   "description": "Read-only archive viewer with safe Markdown notes, complete related task families, list and calendar views.",
   "hooks": [],

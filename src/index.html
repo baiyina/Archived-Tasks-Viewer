@@ -130,15 +130,7 @@
         min-width: 260px;
         flex: 0 0 auto;
       }
-      .field-inline {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--muted);
-        font-size: 13px;
-      }
       input,
-      select,
       button {
         background: var(--card);
         color: inherit;
@@ -149,20 +141,7 @@
         height: 38px;
         line-height: 1.05;
       }
-      select {
-        appearance: none;
-        background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-          linear-gradient(135deg, var(--muted) 50%, transparent 50%),
-          linear-gradient(to right, transparent, transparent);
-        background-position: calc(100% - 18px) calc(50% - 3px),
-          calc(100% - 12px) calc(50% - 3px),
-          calc(100% - 44px) 0.35em;
-        background-size: 6px 6px, 6px 6px, 1px 1.2em;
-        background-repeat: no-repeat;
-        padding-right: 42px;
-      }
-      input:focus,
-      select:focus {
+      input:focus {
         outline: 1px solid var(--focus-outline);
         box-shadow: var(--focus-shadow);
       }
@@ -420,7 +399,6 @@
         border: 1px solid var(--border);
         font-size: 11px;
       }
-      .subtask,
       .attachment {
         display: flex;
         align-items: center;
@@ -437,32 +415,6 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
-      .subtask .row-actions {
-        justify-content: flex-end;
-      }
-      .subtask-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: var(--accent-border);
-        flex: 0 0 auto;
-        box-shadow: 0 0 0 4px var(--surface-2);
-      }
-      .subtask-main {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        flex: 1;
-        min-width: 0;
-      }
-      .subtask-meta {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        color: var(--muted);
-        font-size: 13px;
       }
       .attachment a {
         color: inherit;
@@ -578,12 +530,6 @@
         min-height: 0;
         padding-right: 4px;
       }
-      .truncate {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
       /* Modal */
       #modal-root {
         position: fixed;
@@ -646,16 +592,6 @@
       }
       .kv-value {
         font-weight: 600;
-      }
-      @media (max-width: 540px) {
-        .title-row {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .card-footer {
-          flex-direction: column;
-          align-items: flex-start;
-        }
       }
     </style>
   </head>
